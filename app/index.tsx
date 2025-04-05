@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -195,4 +196,11 @@ const styles = StyleSheet.create({
   },
 });
 
+=======
+import { Redirect } from 'expo-router';
+>>>>>>> Stashed changes
 
+export default function Index() {
+  // Redirect to the splash screen
+  return <Redirect href="/_auth/_splash" />;
+} 
