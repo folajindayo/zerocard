@@ -18,7 +18,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'large',
   color = '#40ff00',
   style,
-  useLottie = true,
+  useLottie = false,
   lottieSource = 'https://lottie.host/ba1c24cb-50de-47c1-8781-d609401ac8df/qn48q8KwW9.lottie'
 }) => {
   const spinnerSize = typeof size === 'string' ? (size === 'large' ? 50 : 24) : size;

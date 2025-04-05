@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Clipboard, ToastAndroid, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Clipboard, ToastAndroid, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import QRCode from 'react-native-qrcode-svg';
-import { Button } from './Button';
+import { Button, buttonContainerStyles } from './Button';
 import { SquircleView } from 'react-native-figma-squircle';
 
 // Import SVG files as strings
@@ -109,17 +109,18 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
         </View>
         
         {/* Button container */}
-        <View style={styles.buttonContainer}>
+        <View style={buttonContainerStyles.container}>
           <Button 
             title="I've funded the wallet"
+            variant="primary"
             onPress={onFundedWallet}
-            style={styles.buttonWidth}
           />
           
           <Button 
             title="Skip"
+            variant="secondary"
+            showRightArrow={true}
             onPress={onSkip}
-            style={styles.buttonWidth}
           />
         </View>
       </View>
@@ -167,7 +168,6 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   tokenSelector: {
-    boxSizing: 'border-box',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -236,7 +236,6 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   addressContainer: {
-    boxSizing: 'border-box',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -260,7 +259,6 @@ const styles = StyleSheet.create({
     color: '#121212',
   },
   copyButton: {
-    boxSizing: 'border-box',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -299,19 +297,6 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: '#484848',
     flex: 1,
-  },
-  buttonContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    padding: 0,
-    gap: 16,
-    width: 354,
-    height: 114,
-    alignSelf: 'stretch',
-  },
-  buttonWidth: {
-    width: 354,
   },
 });
 
