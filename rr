@@ -1,0 +1,13 @@
+app/
+├── +layout.tsx               ← Global app layout (wraps everything)
+├── (tabs)/                   ← Tab navigation group
+│   ├── +layout.tsx           ← Tab layout (bottom tabs setup)
+│   ├── index.tsx             ← Home tab screen
+│   └── profile/              ← Profile tab
+│       ├── [id].tsx          ← Dynamic profile screen
+│       └── +layout.tsx       ← Optional layout just for Profile tab
+├── _auth/                    ← Screens outside tabs (Splash, Create Account)
+│   ├── +layout.tsx           ← Layout specific to auth screens
+│   ├── _splash.tsx           ← Splash screen
+│   └── _create-account.tsx   ← Create account screen
+└── settings.tsx              ← A standalone screen outside tab and auth flow

@@ -1,24 +1,14 @@
+import '../global.css';
+import { Stack } from 'expo-router';
+import { View } from 'react-native';
 
-  import '../global.css';
-
-
-
-
-
-
-	import { Stack } from "expo-router";
-
-
-
-export default function Layout() {
-  
-  
-
+export default function RootLayout() {
 	return (
-		
-        
-            <Stack />
-        
-		
+		<Stack
+			screenOptions={{
+				headerShown: false,
+				animation: 'slide_from_right',
+			}}
+		/>
 	);
 }
