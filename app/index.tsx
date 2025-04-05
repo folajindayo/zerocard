@@ -9,28 +9,28 @@ export default function SplashScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      
+
       <View style={styles.imageContainer}>
         {/* Note: You should download the image from the Figma design URL below and add it to your assets folder */}
         {/* https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/0777491a-89ca-4df5-9c31-3397f6fb27e3 */}
-        <Image 
-          source={require('../assets/splashscreen-card.png')}
+        <Image
+          source={require('../assets/splash.png')}
           style={styles.cardImage}
           resizeMode="contain"
         />
       </View>
-      
+
       <View style={styles.contentContainer}>
         <Text style={styles.title}>
-          Spend crypto{'\n'}
+          Spend crypto{`\n`}
           like cash 💸
         </Text>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.getStartedButton}
           onPress={() => {
             // @ts-ignore - Navigate to login page
-            router.push('/auth/login');
+            router.push('/_auth/_login');
           }}
         >
           <Text style={styles.buttonText}>Start spending</Text>
@@ -38,13 +38,13 @@ export default function SplashScreen() {
             <Text style={styles.arrow}>→</Text>
           </View>
         </TouchableOpacity>
-        
+
         <Text style={styles.termsText}>
           By using Zerocard, you agree to accept our{' '}
           <Text style={styles.termsLink}>Terms of Use</Text> and{' '}
           <Text style={styles.termsLink}>Privacy Policy</Text>
         </Text>
-        
+
         <View style={styles.betaButtonContainer}>
           <TouchableOpacity style={styles.betaButton}>
             <Ionicons name="flask-outline" size={14} color="#ababab" />
