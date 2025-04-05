@@ -36,10 +36,10 @@ export default function SplashScreen() {
     );
   }
 
-  // If user is authenticated, redirect to home using file-based routing
+  // If user is authenticated, redirect to the post-auth onboarding screen within the (app) group
   if (user) {
-    return <Redirect href="/(app)/_onboarding/post-auth" />;
-  }``
+    return <Redirect href="/(app)/post-auth" />;
+  }
 
   const handleStartSpending = async () => {
     try {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Clipboard, ToastAndroid, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Clipboard, ToastAndroid, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import QRCode from 'react-native-qrcode-svg';
@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   tokenSelector: {
-    boxSizing: 'border-box',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -237,7 +236,6 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   addressContainer: {
-    boxSizing: 'border-box',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -261,7 +259,6 @@ const styles = StyleSheet.create({
     color: '#121212',
   },
   copyButton: {
-    boxSizing: 'border-box',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

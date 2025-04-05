@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import AddMoney from '../../../components/AddMoney';
-import CryptoDepositModal from '../../../components/CryptoDepositModal';
-import UsernameModal from '../../../components/UsernameModal';
-import { Button } from '../../../components/Button';
+
+import AddMoney from '../../components/AddMoney';
+import CryptoDepositModal from '../../components/CryptoDepositModal';
+import UsernameModal from '../../components/UsernameModal';
+import { Button } from '../../components/Button';
 
 export default function AddMoneyScreen() {
   const router = useRouter();
@@ -54,10 +55,11 @@ export default function AddMoneyScreen() {
   };
 
   const handleSetUsername = (username: string) => {
-    // Save username and navigate to the home screen
+    // Save username (implementation needed)
     console.log(`Username set to: ${username}`);
     setShowUsernameModal(false);
-    router.push('/');
+    // Navigate to the main home screen within the (app) group
+    router.push('/home');
   };
 
   return (
