@@ -1,8 +1,9 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
+import { usePrivy, useLogin } from '@privy-io/expo';
+import { Redirect } from 'expo-router';
 
 // Import the Zerocard logo as a string
 const zerocardLogo = `<svg width="37" height="28" viewBox="0 0 37 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -20,10 +21,44 @@ const zerocardLogo = `<svg width="37" height="28" viewBox="0 0 37 28" fill="none
 </svg>`;
 
 export default function SplashScreen() {
-  const router = useRouter();
+  const privyContext = usePrivy() as any;
+  const { user } = privyContext;
+  const ready = privyContext.isReady === true;
+  const { login } = useLogin();
+
+  // Show loading state while Privy initializes
+  if (!ready) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#40ff00" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  // If user is authenticated, redirect to home using file-based routing
+  if (user) {
+    return <Redirect href="/home" />;
+  }``
+
+  const handleStartSpending = async () => {
+    try {
+      await login({ loginMethods: ['email'] });
+      console.log('Login initiated successfully');
+    } catch (error: any) {
+      // Log all errors to terminal for debugging
+      console.log('=== Login Error Details ===');
+      console.log('Error type:', error?.name);
+      console.log('Error message:', error?.message);
+      console.log('Error stack:', error?.stack);
+      console.log('=== End Error Details ===');
+    }
+  };
 
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" />
+
       <View style={styles.mainContent}>
         <View style={styles.imageContainer}>
           <Image
@@ -47,10 +82,7 @@ export default function SplashScreen() {
             <View style={styles.actionContainer}>
               <TouchableOpacity
                 style={styles.getStartedButton}
-                onPress={() => {
-                  // @ts-ignore - Navigate to login page
-                  router.push('/(app)/post-auth');
-                }}
+                onPress={handleStartSpending}
               >
                 <Text style={styles.buttonText}>Start spending</Text>
                 <View style={styles.arrowContainer}>
@@ -66,12 +98,12 @@ export default function SplashScreen() {
             </View>
           </View>
         </View>
-      </View>
 
-      <TouchableOpacity style={styles.betaButton}>
-        <Ionicons name="flask-outline" size={16} color="#ABABAB" />
-        <Text style={styles.betaText}>We are in Beta</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.betaButton}>
+          <Ionicons name="flask-outline" size={16} color="#ABABAB" />
+          <Text style={styles.betaText}>We are in Beta</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -152,7 +184,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: '500',
     fontSize: 14,
-    lineHeight: 16.8, // 14 * 120%
+    lineHeight: 16.8,
     fontFamily: 'System',
   },
   arrowContainer: {
@@ -186,13 +218,23 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 1,
-    marginBottom: 20,
   },
   betaText: {
     fontFamily: 'SF Pro Text',
-    fontSize: 14,
     fontWeight: '500',
+    fontSize: 14,
     lineHeight: 17,
     color: '#ABABAB',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F7F7F7',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#333',
   },
 });
