@@ -2,8 +2,7 @@ module.exports = function(api) {
   api.cache(true);
 
   const plugins = [
-    // Required for expo-router
-    'expo-router/babel',
+    // Required for expo-router is now included in babel-preset-expo for SDK 50
     'react-native-reanimated/plugin',
   ];
 
