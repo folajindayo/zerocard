@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SquircleView } from 'react-native-figma-squircle';
+import LoadingSpinner from './LoadingSpinner';
 
 interface UsernameModalProps {
   visible: boolean;
@@ -36,6 +37,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   const opacity = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(100)).current;
   const modalPosition = React.useRef(new Animated.Value(0)).current;
+  const { width } = Dimensions.get('window');
 
   // Handle animation when visibility changes
   React.useEffect(() => {
@@ -152,6 +154,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
           style={[
             styles.modalAnimatedContainer,
             {
+              left: (width - 354) / 2, // Center horizontally
               opacity,
               transform: [
                 { translateY: translateY },
@@ -211,9 +214,11 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
                       <View style={styles.statusContainer}>
                         {status === 'checking' && (
                           <>
-                            <View style={styles.spinnerContainer}>
-                              <View style={styles.spinner} />
-                            </View>
+                            <LoadingSpinner 
+                              size={16} 
+                              color="#2D2D2D"
+                              style={{ padding: 0 }} 
+                            />
                             <Text style={styles.statusText}>Checking</Text>
                           </>
                         )}
@@ -260,8 +265,6 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   );
 };
 
-const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
@@ -271,7 +274,6 @@ const styles = StyleSheet.create({
   },
   modalAnimatedContainer: {
     position: 'absolute',
-    left: 24,
     top: 496,
     width: 354,
   },
@@ -356,14 +358,6 @@ const styles = StyleSheet.create({
     height: 16,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  spinner: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#D9D9D9',
-    borderLeftColor: '#2D2D2D',
   },
   statusText: {
     fontFamily: 'SF Pro Text',

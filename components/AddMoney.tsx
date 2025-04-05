@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Clipb
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import QRCode from 'react-native-qrcode-svg';
-import Button from './Button';
+import { Button, buttonContainerStyles } from './Button';
 import { SquircleView } from 'react-native-figma-squircle';
 
 // Import SVG files as strings
@@ -109,20 +109,18 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
         </View>
         
         {/* Button container */}
-        <View style={styles.buttonContainer}>
+        <View style={buttonContainerStyles.container}>
           <Button 
+            title="I've funded the wallet"
             variant="primary"
-            label="I've funded the wallet"
             onPress={onFundedWallet}
-            style={styles.buttonWidth}
           />
           
           <Button 
+            title="Skip"
             variant="secondary"
-            label="Skip"
+            showRightArrow={true}
             onPress={onSkip}
-            icon={{ name: "arrow-forward" }}
-            style={styles.buttonWidth}
           />
         </View>
       </View>
@@ -302,19 +300,6 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: '#484848',
     flex: 1,
-  },
-  buttonContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    padding: 0,
-    gap: 16,
-    width: 354,
-    height: 114,
-    alignSelf: 'stretch',
-  },
-  buttonWidth: {
-    width: 354,
   },
 });
 

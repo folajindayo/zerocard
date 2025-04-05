@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import AddMoney from '../../../components/AddMoney';
 import CryptoDepositModal from '../../../components/CryptoDepositModal';
 import UsernameModal from '../../../components/UsernameModal';
+import { Button } from '../../../components/Button';
 
 export default function AddMoneyScreen() {
   const router = useRouter();

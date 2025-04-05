@@ -38,7 +38,7 @@ export default function SplashScreen() {
 
   // If user is authenticated, redirect to home using file-based routing
   if (user) {
-    return <Redirect href="/home" />;
+    return <Redirect href="/(app)/_onboarding/post-auth" />;
   }``
 
   const handleStartSpending = async () => {

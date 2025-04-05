@@ -22,6 +22,7 @@ interface CryptoDepositModalProps {
   timestamp: { date: string; time: string };
   transactionHash?: string;
   chain?: string;
+  position?: { top: number; left: number };
 }
 
 const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
@@ -31,10 +32,12 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
   currency,
   timestamp,
   transactionHash,
-  chain = 'Base'
+  chain = 'Base',
+  position
 }) => {
   const opacity = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(100)).current;
+  const { width } = Dimensions.get('window');
 
   React.useEffect(() => {
     if (visible) {
@@ -77,6 +80,12 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
 <path d="M6.85257 13.224C4.33245 12.2987 3.03983 9.42451 3.97731 6.88095C4.46195 5.49341 5.52815 4.4365 6.85257 3.94094C6.98206 3.87514 7.04642 3.77603 7.04642 3.61031V3.14806C7.04642 3.01565 6.98206 2.91654 6.85257 2.88403C6.82 2.88403 6.75564 2.88403 6.72307 2.91733C3.65396 3.90844 1.97363 7.24488 2.9429 10.3839C3.52447 12.2337 4.91402 13.6545 6.72307 14.2492C6.85257 14.315 6.98129 14.2492 7.01385 14.1168C7.04642 14.0835 7.04642 14.051 7.04642 13.9844V13.5221C7.04642 13.4222 6.94949 13.2906 6.85257 13.224ZM10.2768 2.91654C10.1473 2.85073 10.0186 2.91654 9.98603 3.04895C9.95347 3.08225 9.95347 3.11476 9.95347 3.18136V3.64361C9.95347 3.77602 10.0504 3.90764 10.1473 3.97425C12.6674 4.89954 13.9601 7.77374 13.0226 10.3173C12.5379 11.7048 11.4717 12.7618 10.1473 13.2573C10.0178 13.3231 9.95347 13.4222 9.95347 13.5879V14.0502C9.95347 14.1826 10.0178 14.2817 10.1473 14.3142C10.1799 14.3142 10.2442 14.3142 10.2768 14.2809C13.3459 13.2898 15.0263 9.95337 14.057 6.81435C13.4754 4.93205 12.0541 3.5112 10.2768 2.91654Z" fill="white"/>
 </svg>`;
 
+  // Use position prop if provided, otherwise center horizontally
+  const positionStyle = position || {
+    left: (width - 354) / 2, // Center horizontally (354 is modal width)
+    top: 437, // Default top position
+  };
+
   return (
     <Modal
       transparent
@@ -92,6 +101,10 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
         <Animated.View 
           style={[
             styles.modalAnimatedContainer,
+            { 
+              left: positionStyle.left,
+              top: positionStyle.top
+            },
             {
               opacity,
               transform: [{ translateY }]
@@ -197,8 +210,6 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
   );
 };
 
-const { width, height } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
@@ -208,8 +219,6 @@ const styles = StyleSheet.create({
   },
   modalAnimatedContainer: {
     position: 'absolute',
-    left: 24,
-    top: 437,
     width: 354,
   },
   modalContainer: {

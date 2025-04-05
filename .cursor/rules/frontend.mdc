@@ -1,0 +1,421 @@
+# ZeroCard Frontend Development Guidelines
+
+## Architecture Overview
+
+### Project Structure
+```
+src/
+├── components/
+│   ├── common/
+│   ├── screens/
+│   └── navigation/
+├── hooks/
+├── services/
+├── store/
+├── theme/
+├── types/
+└── utils/
+```
+
+## Component Guidelines
+
+### Component Structure
+- Use functional components with hooks
+- Follow single responsibility principle
+- Keep components small and focused
+- Implement proper TypeScript interfaces
+- Use proper prop validation
+
+### Example Component Structure
+```typescript
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useTheme } from '@hooks/useTheme';
+import { ComponentProps } from './types';
+
+export const MyComponent: React.FC<ComponentProps> = ({ prop1, prop2 }) => {
+  const theme = useTheme();
+  
+  return (
+    <View style={styles.container}>
+      {/* Component content */}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    // styles
+  },
+});
+```
+
+## State Management
+
+### Redux Guidelines
+- Use Redux Toolkit for state management
+- Implement proper slice organization
+- Use selectors for data access
+- Implement proper TypeScript types
+- Handle async operations with createAsyncThunk
+
+### Example Redux Structure
+```typescript
+// store/slices/authSlice.ts
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+export const loginUser = createAsyncThunk(
+  'auth/login',
+  async (credentials: LoginCredentials) => {
+    // Implementation
+  }
+);
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {
+    // Reducers
+  },
+  extraReducers: (builder) => {
+    // Extra reducers
+  },
+});
+```
+
+## Navigation
+
+### Navigation Structure
+- Implement proper stack navigation
+- Use proper typing for routes
+- Handle authentication flow
+- Implement deep linking
+- Handle screen transitions
+
+### Example Navigation Setup
+```typescript
+// navigation/AppNavigator.tsx
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+export const AppNavigator = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        {/* Stack screens */}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+```
+
+## Styling Guidelines
+
+### Theme System
+- Use consistent color palette
+- Implement proper spacing system
+- Use typography system
+- Handle dark/light modes
+- Support multiple screen sizes
+
+### Example Theme Structure
+```typescript
+// theme/index.ts
+export const theme = {
+  colors: {
+    primary: '#007AFF',
+    secondary: '#5856D6',
+    // Other colors
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 16,
+    // Other spacing
+  },
+  typography: {
+    h1: {
+      fontSize: 32,
+      fontWeight: 'bold',
+    },
+    // Other typography
+  },
+};
+```
+
+## API Integration
+
+### API Service Structure
+- Implement proper API client
+- Handle authentication
+- Implement error handling
+- Use proper TypeScript types
+- Handle offline support
+
+### Example API Service
+```typescript
+// services/api.ts
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: CONFIG.API_URL,
+});
+
+api.interceptors.request.use((config) => {
+  // Handle request interceptor
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle error response
+    return Promise.reject(error);
+  }
+);
+```
+
+## Form Handling
+
+### Form Guidelines
+- Use React Hook Form
+- Implement proper validation
+- Handle form submission
+- Show proper error messages
+- Handle loading states
+
+### Example Form Implementation
+```typescript
+// components/screens/LoginForm.tsx
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+
+const schema = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup.string().min(8).required(),
+});
+
+export const LoginForm = () => {
+  const { control, handleSubmit } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = (data: FormData) => {
+    // Handle form submission
+  };
+
+  return (
+    // Form implementation
+  );
+};
+```
+
+## Testing Guidelines
+
+### Testing Structure
+- Write unit tests for components
+- Implement integration tests
+- Use proper mocking
+- Test error scenarios
+- Maintain good coverage
+
+### Example Test Implementation
+```typescript
+// __tests__/components/MyComponent.test.tsx
+import { render, fireEvent } from '@testing-library/react-native';
+import { MyComponent } from '@components/MyComponent';
+
+describe('MyComponent', () => {
+  it('renders correctly', () => {
+    const { getByTestId } = render(<MyComponent />);
+    expect(getByTestId('component')).toBeTruthy();
+  });
+
+  // Other test cases
+});
+```
+
+## Performance Guidelines
+
+### Performance Optimization
+- Implement proper memoization
+- Handle list rendering
+- Optimize images
+- Minimize re-renders
+- Handle animations properly
+
+### Example Performance Implementation
+```typescript
+// components/common/OptimizedList.tsx
+import { memo } from 'react';
+import { FlatList } from 'react-native';
+
+export const OptimizedList = memo(({ data, renderItem }) => {
+  const keyExtractor = (item: Item) => item.id;
+
+  return (
+    <FlatList
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      removeClippedSubviews
+      maxToRenderPerBatch={10}
+      windowSize={5}
+    />
+  );
+});
+```
+
+## Error Handling
+
+### Error Guidelines
+- Implement proper error boundaries
+- Handle API errors
+- Show user-friendly messages
+- Log errors properly
+- Handle offline scenarios
+
+### Example Error Handling
+```typescript
+// components/common/ErrorBoundary.tsx
+import { Component, ErrorInfo } from 'react';
+
+export class ErrorBoundary extends Component<Props, State> {
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log error
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorView />;
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+## Security Guidelines
+
+### Security Measures
+- Implement proper authentication
+- Handle sensitive data
+- Implement proper validation
+- Use secure storage
+- Handle permissions properly
+
+### Example Security Implementation
+```typescript
+// services/secureStorage.ts
+import * as SecureStore from 'expo-secure-store';
+
+export const secureStorage = {
+  async set(key: string, value: string) {
+    await SecureStore.setItemAsync(key, value);
+  },
+
+  async get(key: string) {
+    return await SecureStore.getItemAsync(key);
+  },
+
+  async remove(key: string) {
+    await SecureStore.deleteItemAsync(key);
+  },
+};
+```
+
+## Accessibility Guidelines
+
+### Accessibility Features
+- Implement proper labels
+- Handle screen readers
+- Support dynamic text sizes
+- Implement proper contrast
+- Handle focus states
+
+### Example Accessibility Implementation
+```typescript
+// components/common/AccessibleButton.tsx
+import { TouchableOpacity, AccessibilityProps } from 'react-native';
+
+export const AccessibleButton: React.FC<Props & AccessibilityProps> = ({
+  onPress,
+  label,
+  ...props
+}) => {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      accessible
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      {...props}
+    >
+      {/* Button content */}
+    </TouchableOpacity>
+  );
+};
+```
+
+## Documentation Guidelines
+
+### Documentation Requirements
+- Document components
+- Document hooks
+- Document utilities
+- Maintain README
+- Document API integration
+
+### Example Documentation
+```typescript
+/**
+ * CustomComponent - A reusable component for displaying custom content
+ * @param {string} title - The title to display
+ * @param {ReactNode} children - The content to render
+ * @returns {ReactElement} The rendered component
+ */
+export const CustomComponent: React.FC<Props> = ({ title, children }) => {
+  // Implementation
+};
+```
+
+## Code Review Guidelines
+
+### Review Checklist
+- Check code style
+- Verify TypeScript types
+- Review performance
+- Check accessibility
+- Verify documentation
+
+### Pull Request Template
+```markdown
+## Description
+[Description of changes]
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Manual testing
+
+## Screenshots
+[If applicable]
+
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Tests added/updated
+- [ ] Documentation updated
+- [ ] Accessibility verified
+``` 

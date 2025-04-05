@@ -9,7 +9,7 @@ export default function PostAuthScreen() {
   // Auto-navigate to add-money screen after authentication
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/(app)/add-money');
+      router.push('/(app)/_onboarding/add-money');
     }, 2000); // 2 seconds delay
     
     return () => clearTimeout(timer);
