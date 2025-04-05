@@ -1,10 +1,43 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { usePrivy, useLogin } from '@privy-io/expo';
+import { Redirect } from 'expo-router';
 
 export default function SplashScreen() {
-  const router = useRouter();
+  const privyContext = usePrivy() as any;
+  const { user } = privyContext;
+  const ready = privyContext.isReady === true;
+  const { login } = useLogin();
+
+  // Show loading state while Privy initializes
+  if (!ready) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#40ff00" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  // If user is authenticated, redirect to home using file-based routing
+  if (user) {
+    return <Redirect href="/home" />;
+  }
+
+  const handleStartSpending = async () => {
+    try {
+      await login({ loginMethods: ['email'] });
+      console.log('Login initiated successfully');
+    } catch (error: any) {
+      // Log all errors to terminal for debugging
+      console.log('=== Login Error Details ===');
+      console.log('Error type:', error?.name);
+      console.log('Error message:', error?.message);
+      console.log('Error stack:', error?.stack);
+      console.log('=== End Error Details ===');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -28,10 +61,7 @@ export default function SplashScreen() {
 
         <TouchableOpacity
           style={styles.getStartedButton}
-          onPress={() => {
-            // @ts-ignore - Navigate to login page
-            router.push('/_auth/_login');
-          }}
+          onPress={handleStartSpending}
         >
           <Text style={styles.buttonText}>Start spending</Text>
           <View style={styles.arrowContainer}>
@@ -57,6 +87,17 @@ export default function SplashScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#333',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
@@ -102,7 +143,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 8,
-    // Inner shadow effect (approximated)
     borderTopWidth: 4,
     borderTopColor: '#38e600',
   },
