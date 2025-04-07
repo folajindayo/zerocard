@@ -2,6 +2,7 @@ import '../global.css';
 import { Stack } from 'expo-router';
 import { PrivyProvider, PrivyElements } from '@privy-io/expo';
 import { useEffect } from 'react';
+import NetworkStatus from '../components/NetworkStatus';
 
 export default function RootLayout() {
   // Get Privy app ID and client ID directly from environment variables
@@ -38,6 +39,9 @@ export default function RootLayout() {
       appId={privyAppId}
       clientId={privyClientId}
     >
+      {/* Network status toast notification */}
+      <NetworkStatus />
+      
       <Stack 
         screenOptions={{
           headerShown: false,

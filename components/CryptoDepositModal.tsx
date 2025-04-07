@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import { SquircleView } from 'react-native-figma-squircle';
+import BlurBackground from './BlurBackground';
 
 interface CryptoDepositModalProps {
   visible: boolean;
@@ -93,6 +94,8 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
       animationType="none"
       onRequestClose={onClose}
     >
+      <BlurBackground visible={visible} intensity={40} tint="dark" />
+      
       <TouchableOpacity 
         style={styles.modalOverlay}
         activeOpacity={1}
@@ -213,7 +216,6 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },

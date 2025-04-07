@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-n
 import { useRouter, usePathname } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
+import * as Haptics from 'expo-haptics';
 
 interface NavigationBarProps {
   onHomePress?: () => void;
@@ -64,7 +65,20 @@ export function NavigationBar({
     return pathname === path;
   };
 
-  const handleHomePress = () => {
+  const triggerHaptic = async () => {
+    try {
+      // Use selectionAsync for a soft, subtle feedback - best for UI interactions
+      await Haptics.selectionAsync();
+      
+      // Fallback to light impact if needed
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (error) {
+      console.log('Haptic feedback error:', error);
+    }
+  };
+
+  const handleHomePress = async () => {
+    await triggerHaptic();
     if (onHomePress) {
       onHomePress();
     } else {
@@ -72,7 +86,8 @@ export function NavigationBar({
     }
   };
 
-  const handleCardPress = () => {
+  const handleCardPress = async () => {
+    await triggerHaptic();
     if (onCardPress) {
       onCardPress();
     } else {
@@ -80,7 +95,8 @@ export function NavigationBar({
     }
   };
 
-  const handleAddPress = () => {
+  const handleAddPress = async () => {
+    await triggerHaptic();
     if (onAddPress) {
       onAddPress();
     } else {
@@ -88,7 +104,8 @@ export function NavigationBar({
     }
   };
 
-  const handleProfilePress = () => {
+  const handleProfilePress = async () => {
+    await triggerHaptic();
     if (onProfilePress) {
       onProfilePress();
     } else {
@@ -133,9 +150,9 @@ export function NavigationBar({
         <View style={styles.iconsContainer}>
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => {
+            onPress={async () => {
               setActiveTab('home');
-              handleHomePress();
+              await handleHomePress();
             }}
             activeOpacity={0.7}
             hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
@@ -145,9 +162,9 @@ export function NavigationBar({
 
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => {
+            onPress={async () => {
               setActiveTab('card');
-              handleCardPress();
+              await handleCardPress();
             }}
             activeOpacity={0.7}
             hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
@@ -157,9 +174,9 @@ export function NavigationBar({
 
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => {
+            onPress={async () => {
               setActiveTab('add');
-              handleAddPress();
+              await handleAddPress();
             }}
             activeOpacity={0.7}
             hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
@@ -169,9 +186,9 @@ export function NavigationBar({
 
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => {
+            onPress={async () => {
               setActiveTab('profile');
-              handleProfilePress();
+              await handleProfilePress();
             }}
             activeOpacity={0.7}
             hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}

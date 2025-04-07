@@ -9,11 +9,14 @@ import {
   Animated,
   Easing,
   TextInput,
-  Keyboard
+  Keyboard,
+  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SquircleView } from 'react-native-figma-squircle';
 import LoadingSpinner from './LoadingSpinner';
+import BlurBackground from './BlurBackground';
+import * as Haptics from 'expo-haptics';
 
 interface UsernameModalProps {
   visible: boolean;
@@ -33,11 +36,19 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   const [username, setUsername] = React.useState(initialUsername);
   const [status, setStatus] = React.useState<ValidationStatus>('empty');
   const [isKeyboardVisible, setKeyboardVisible] = React.useState(false);
+  const [hasSetUsername, setHasSetUsername] = React.useState(false);
   
   const opacity = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(100)).current;
   const modalPosition = React.useRef(new Animated.Value(0)).current;
   const { width } = Dimensions.get('window');
+
+  // Reset hasSetUsername when modal becomes visible
+  React.useEffect(() => {
+    if (visible) {
+      setHasSetUsername(false);
+    }
+  }, [visible]);
 
   // Handle animation when visibility changes
   React.useEffect(() => {
@@ -121,17 +132,49 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
       // In a real app, you would make an API call to check username availability
       if (username === 'folajindayo') {
         setStatus('taken');
+        // Trigger error haptic feedback for taken username
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       } else {
         setStatus('available');
+        // Trigger success haptic feedback for available username
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     }, 1000);
 
     return () => clearTimeout(timer);
   }, [username]);
 
+  // Modified close handler to prevent closing if username not set
+  const handleClose = () => {
+    if (hasSetUsername) {
+      Keyboard.dismiss();
+      onClose();
+    } else {
+      Alert.alert(
+        "Username Required",
+        "Please set a username before continuing.",
+        [{ text: "OK" }]
+      );
+    }
+  };
+
   const handleSetUsername = () => {
     if (status === 'available' && username.length > 0) {
       onSetUsername(username);
+      setHasSetUsername(true);
+      onClose();
+    } else if (status === 'taken') {
+      Alert.alert(
+        "Username Not Available",
+        "This username is already taken. Please choose another one.",
+        [{ text: "OK" }]
+      );
+    } else if (status === 'empty' || username.length === 0) {
+      Alert.alert(
+        "Username Required",
+        "Please enter a username to continue.",
+        [{ text: "OK" }]
+      );
     }
   };
 
@@ -140,15 +183,14 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
       transparent
       visible={visible}
       animationType="none"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
+      <BlurBackground visible={visible} intensity={40} tint="dark" />
+      
       <TouchableOpacity 
         style={styles.modalOverlay}
         activeOpacity={1}
-        onPress={() => {
-          Keyboard.dismiss();
-          onClose();
-        }}
+        onPress={handleClose}
       >
         <Animated.View 
           style={[
@@ -268,7 +310,6 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },

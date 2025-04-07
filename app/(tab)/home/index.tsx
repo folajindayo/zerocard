@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,61 +13,97 @@ import { Ionicons } from '@expo/vector-icons';
 import { usePrivy } from '@privy-io/expo';
 import GreetingHeader from '../../../components/GreetingHeader';
 import UsdcBalance from '../../../components/UsdcBalance';
+import CardModule from '../../../components/CardModule';
+import CardStatusComponent from '../../../components/CardStatus';
+import UsernameModal from '../../../components/UsernameModal';
+import CardControls from '../../../components/CardControls';
+import TransactionItem from '../../../components/TransactionItem';
+
+// Import mockdata
+import mockData from '../../../assets/mockdata.json';
 
 // Import the profile icon
 const profileIcon = require('../../../assets/prrofile-icon.png');
 
-// Mock data for recent transactions
-const RECENT_TRANSACTIONS = [
+// User onboarding stages
+type UserStage = 'new_user' | 'ordered_card' | 'activated_card' | 'has_transactions';
+
+// Mock transaction data with type
+const mockTransactions = [
   {
     id: '1',
+    type: 'spend' as const,
     name: 'Starbucks',
-    icon: '☕',
     date: 'Today',
-    category: 'Food',
-    amount: -24.50,
+    time: '9:30am',
+    amount: 24.50,
+    currency: 'USDC',
+    category: 'Food'
   },
   {
     id: '2',
+    type: 'spend' as const,
     name: 'Uber',
-    icon: '🚗',
     date: 'Yesterday',
-    category: 'Transportation',
-    amount: -15.75,
+    time: '6:45pm',
+    amount: 15.75,
+    currency: 'USDC',
+    category: 'Transportation'
   },
   {
     id: '3',
+    type: 'deposit' as const,
     name: 'Salary Deposit',
-    icon: '💰',
     date: 'Jun 25',
-    category: 'Income',
+    time: '10:00am',
     amount: 2750.00,
+    currency: 'USDC',
+    category: 'Income'
   },
   {
     id: '4',
+    type: 'spend' as const,
     name: 'Amazon',
-    icon: '🛒',
     date: 'Jun 23',
-    category: 'Shopping',
-    amount: -67.99,
-  },
-];
-
-// Quick action buttons
-const QUICK_ACTIONS = [
-  { id: '1', name: 'Send', icon: '📤' },
-  { id: '2', name: 'Request', icon: '📥' },
-  { id: '3', name: 'Pay', icon: '💳' },
-  { id: '4', name: 'Top up', icon: '📈' },
+    time: '2:20pm',
+    amount: 67.99,
+    currency: 'USDC',
+    category: 'Shopping'
+  }
 ];
 
 export default function HomeScreen() {
   const { user, logout } = usePrivy() as any;
   const insets = useSafeAreaInsets();
+  
+  // State for user's stage in the onboarding process
+  const [userStage, setUserStage] = useState<UserStage>('new_user');
+  
+  // State for username modal
+  const [usernameModalVisible, setUsernameModalVisible] = useState(false);
+  const [username, setUsername] = useState<string>('');
 
-  // Get username from email or use a default
-  const username = user?.email ? user.email.split('@')[0] : 'User';
-  const userInitial = user?.email && user.email.length > 0 ? user.email[0].toUpperCase() : 'U';
+  // Get username from state or email as fallback
+  const displayName = username || (user?.email ? user.email.split('@')[0] : '');
+  const userInitial = displayName && displayName.length > 0 ? displayName[0].toUpperCase() : 'U';
+
+  // Open username modal automatically for new users after 1 second
+  useEffect(() => {
+    if (userStage === 'new_user') {
+      const timer = setTimeout(() => {
+        setUsernameModalVisible(true);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [userStage]);
+  
+  // Handle username setup
+  const handleSetUsername = (newUsername: string) => {
+    setUsername(newUsername);
+    setUsernameModalVisible(false);
+    // In a real app, you would save this to user profile/backend
+  };
 
   // If no user, redirect to root
   if (!user) {
@@ -83,31 +119,72 @@ export default function HomeScreen() {
     }
   };
 
-  // Render individual transaction
-  const renderTransaction = (transaction: typeof RECENT_TRANSACTIONS[0]) => (
-    <View key={transaction.id} style={styles.transactionItem}>
-      <View style={styles.transactionIconContainer}>
-        <Text style={styles.transactionIcon}>{transaction.icon}</Text>
-      </View>
-      <View style={styles.transactionDetails}>
-        <Text style={styles.transactionName}>{transaction.name}</Text>
-        <Text style={styles.transactionCategory}>{transaction.category} • {transaction.date}</Text>
-      </View>
-      <Text style={[
-        styles.transactionAmount,
-        transaction.amount > 0 ? styles.positiveAmount : styles.negativeAmount
-      ]}>
-        {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toFixed(2)}
-      </Text>
+  // Handlers for card status actions
+  const handleOrderCard = () => {
+    // In a real app, this would call an API to order a card
+    console.log('Order card pressed');
+    setUserStage('ordered_card');
+  };
+
+  const handleLoadWallet = () => {
+    console.log('Load wallet pressed');
+  };
+
+  const handleActivateCard = () => {
+    // In a real app, this would call an API to activate the card
+    console.log('Activate card pressed');
+    setUserStage('activated_card');
+  };
+
+  const handleCheckStatus = () => {
+    console.log('Check status pressed');
+  };
+
+  // Card number based on state
+  const getCardNumber = () => {
+    return mockData.userStages[userStage]?.cardNumber || 'No card found';
+  };
+
+  // Get expiry date based on state
+  const getExpiryDate = () => {
+    return mockData.userStages[userStage]?.expiryDate || '··/··';
+  };
+
+  // Get wallet address based on state
+  const getWalletAddress = () => {
+    return mockData.userStages[userStage]?.walletAddress || '········';
+  };
+
+  // Render empty transactions state
+  const renderEmptyTransactions = () => (
+    <View style={styles.emptyTransactionsContainer}>
+      <Text style={styles.emptyTransactionsText}>You have no transactions</Text>
     </View>
   );
 
+  // Toggle between transaction states
+  const toggleTransactionState = () => {
+    if (userStage === 'activated_card') {
+      setUserStage('has_transactions');
+    } else if (userStage === 'has_transactions') {
+      setUserStage('activated_card');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* Username Modal */}
+      <UsernameModal
+        visible={usernameModalVisible}
+        onClose={() => setUsernameModalVisible(false)}
+        onSetUsername={handleSetUsername}
+        initialUsername={username}
+      />
+      
       {/* Fixed Header */}
       <View style={[styles.fixedHeader, { paddingTop: insets.top > 0 ? 8 : 4 }]}>
         <GreetingHeader 
-          username={username}
+          username={displayName}
           profileImage={profileIcon}
           onProfilePress={handleLogout}
         />
@@ -118,29 +195,85 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Balance Section */}
-        <UsdcBalance amount={123.45} />
+        {/* Balance Section - show 0 for new users */}
+        <UsdcBalance amount={userStage === 'new_user' ? 0 : mockData.user.balance} />
 
-        {/* Quick Action Buttons */}
-        <View style={styles.quickActionsContainer}>
-          {QUICK_ACTIONS.map(action => (
-            <TouchableOpacity key={action.id} style={styles.actionButton} onPress={() => {}}>
-              <Text style={styles.actionButtonIcon}>{action.icon}</Text>
-              <Text style={styles.actionButtonText}>{action.name}</Text>
-            </TouchableOpacity>
-          ))}
+        {/* Card Module */}
+        <View style={styles.cardModuleContainer}>
+          <CardModule 
+            cardNumber={getCardNumber()}
+            cardHolderName={displayName || 'Your Name Here'}
+            expiryDate={getExpiryDate()}
+            walletAddress={getWalletAddress()}
+          />
         </View>
+        
+        {/* Card Status - Only show for new users and users who ordered a card */}
+        {(userStage === 'new_user' || userStage === 'ordered_card') && (
+          <View style={styles.cardStatusContainer}>
+            <CardStatusComponent 
+              status={userStage === 'new_user' ? 'not_found' : 'ordered'}
+              onPrimaryButtonPress={userStage === 'new_user' ? handleOrderCard : handleActivateCard}
+              onSecondaryButtonPress={userStage === 'new_user' ? handleLoadWallet : handleCheckStatus}
+            />
+          </View>
+        )}
+        
+        {/* Card Controls - Only show for users with activated cards */}
+        {(userStage === 'activated_card' || userStage === 'has_transactions') && (
+          <View style={styles.cardControlsContainer}>
+            <CardControls 
+              onLoadCard={() => {
+                console.log('Load card pressed');
+              }}
+              onFreezeCard={() => {
+                console.log('Freeze card pressed');
+              }}
+            />
+          </View>
+        )}
 
-        {/* Transactions Section */}
-        <View style={styles.transactionsContainer}>
-          <View style={styles.transactionsHeader}>
-            <Text style={styles.sectionTitle}>Recent Transactions</Text>
-            <TouchableOpacity onPress={() => router.push("/(tab)/profile")}>
-              <Text style={styles.viewAllButton}>View All</Text>
+        {/* Transactions Section - Only show for users with activated cards */}
+        {(userStage === 'activated_card' || userStage === 'has_transactions') && (
+          <View style={styles.transactionsContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Recent Transactions</Text>
+              <Text style={styles.sectionAction}>View All</Text>
+            </View>
+            
+            {/* Show transactions or empty state based on user stage */}
+            {userStage === 'has_transactions' ? (
+              mockTransactions.map(transaction => (
+                <TransactionItem
+                  key={transaction.id}
+                  id={transaction.id}
+                  type={transaction.type}
+                  name={transaction.name}
+                  amount={transaction.amount}
+                  date={transaction.date}
+                  time={transaction.time}
+                  currency={transaction.currency}
+                  category={transaction.category}
+                />
+              ))
+            ) : (
+              renderEmptyTransactions()
+            )}
+            
+            {/* Button to toggle transaction state */}
+            <TouchableOpacity 
+              style={styles.toggleButton} 
+              onPress={toggleTransactionState}
+            >
+              <Text style={styles.toggleButtonText}>
+                {userStage === 'activated_card' 
+                  ? 'Simulate Transactions' 
+                  : 'Clear Transactions'
+                }
+              </Text>
             </TouchableOpacity>
           </View>
-          {RECENT_TRANSACTIONS.map(renderTransaction)}
-        </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -149,10 +282,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
   },
   fixedHeader: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
     zIndex: 10,
     paddingHorizontal: 16,
     paddingBottom: 8,
@@ -164,83 +297,64 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingTop: 16,
   },
-  quickActionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 24,
-  },
-  actionButton: {
-    backgroundColor: '#f7f7f7',
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    width: '22%',
-  },
-  actionButtonIcon: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  actionButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
+  cardModuleContainer: {
+    marginTop: 16,
+    height: 244, // Providing enough height for the stacked cards
   },
   transactionsContainer: {
+    marginTop: 24, // Increased from 16px to 24px from card controls
     marginBottom: 32,
   },
-  transactionsHeader: {
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
   },
   sectionTitle: {
+    fontFamily: 'SF Pro Text',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '500', // Changed from 600 to 500
   },
-  viewAllButton: {
-    color: '#40ff00',
-    fontWeight: '600',
-  },
-  transactionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  transactionIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  transactionIcon: {
-    fontSize: 20,
-  },
-  transactionDetails: {
-    flex: 1,
-  },
-  transactionName: {
-    fontSize: 16,
+  sectionAction: {
+    fontFamily: 'SF Pro Text',
+    fontSize: 14, // Changed from default to 14px
+    color: '#838383', // Changed from #40ff00 to #838383
     fontWeight: '500',
-    marginBottom: 4,
   },
-  transactionCategory: {
-    fontSize: 14,
-    color: '#666',
+  cardStatusContainer: {
+    marginTop: 8, // 16px gap between CardModule and CardStatus
+    marginBottom: 8,
   },
-  transactionAmount: {
+  emptyTransactionsContainer: {
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyTransactionsText: {
+    fontFamily: 'SF Pro Text',
     fontSize: 16,
-    fontWeight: '600',
+    color: '#787878',
+    textAlign: 'center',
   },
-  positiveAmount: {
-    color: '#2ecc71',
+  cardControlsContainer: {
+    marginTop: 8,
+    marginBottom: 16,
+    alignItems: 'center',
   },
-  negativeAmount: {
-    color: '#e74c3c',
+  toggleButton: {
+    marginTop: 16,
+    backgroundColor: '#38E100',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  toggleButtonText: {
+    fontFamily: 'SF Pro Text',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#000000',
+    textAlign: 'center',
   },
 }); 

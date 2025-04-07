@@ -39,29 +39,29 @@ export default function TabLayout() {
             tabBarStyle: { display: 'none' }, // Hide the default tab bar
             contentStyle: { backgroundColor: '#f7f7f7' },
           }}
-          // Use our custom NavigationBar 
+          // Use our custom NavigationBar
           tabBar={() => <NavigationBar />}
         >
           <Tabs.Screen
-            name="home"
+            name="home/index"
             options={{
               title: 'Home',
             }}
           />
           <Tabs.Screen
-            name="card"
+            name="card/index"
             options={{
               title: 'Card',
             }}
           />
           <Tabs.Screen
-            name="load-wallet"
+            name="load-wallet/index"
             options={{
               title: 'Load Wallet',
             }}
           />
           <Tabs.Screen
-            name="profile"
+            name="profile/index"
             options={{
               title: 'Profile',
             }}
@@ -70,4 +70,4 @@ export default function TabLayout() {
       </AuthBoundary>
     </SafeAreaProvider>
   );
-} 
+}
