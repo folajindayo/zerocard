@@ -58,8 +58,8 @@ export default function AddMoneyScreen() {
     // Save username (implementation needed)
     console.log(`Username set to: ${username}`);
     setShowUsernameModal(false);
-    // Navigate to the main home screen within the (app) group
-    router.push('/home');
+    // Navigate to the home tab
+    router.push('/(tab)/home');
   };
 
   return (

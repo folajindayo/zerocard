@@ -1,6 +1,8 @@
 import { Stack, Redirect } from 'expo-router';
-import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, Text, StyleSheet, StatusBar } from 'react-native';
 import { AuthBoundary } from '@privy-io/expo';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import React from 'react';
 
 // Loading component for AuthBoundary
 function FullScreenLoader() {
@@ -23,18 +25,34 @@ function ErrorScreen({ error }: { error: Error }) {
 
 export default function AppLayout() {
   return (
-    <AuthBoundary
-      loading={<FullScreenLoader />}
-      error={(error) => <ErrorScreen error={error} />}
-      unauthenticated={<Redirect href="/" />}
-    >
-      <Stack
-        screenOptions={{
-          headerShown: true,
-          contentStyle: { backgroundColor: '#f7f7f7' },
-        }}
-      />
-    </AuthBoundary>
+    <SafeAreaProvider>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <AuthBoundary
+        loading={<FullScreenLoader />}
+        error={(error) => <ErrorScreen error={error} />}
+        unauthenticated={<Redirect href="/" />}
+      >
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: '#f7f7f7' },
+          }}
+        >
+          <Stack.Screen
+            name="add-money"
+            options={{
+              title: 'Add Money',
+            }}
+          />
+          <Stack.Screen
+            name="post-auth"
+            options={{
+              title: 'Authentication',
+            }}
+          />
+        </Stack>
+      </AuthBoundary>
+    </SafeAreaProvider>
   );
 }
 
