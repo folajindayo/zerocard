@@ -1,16 +1,21 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import ProfileHeader from '../../../components/ProfileHeader';
 import BasenameDialog from '../../../components/BasenameDialog';
 import ProfileSettings from '../../../components/ProfileSettings';
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
+  
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['right', 'left']}>
       <ScrollView 
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{
+          paddingTop: Math.max(24, insets.top), 
+          paddingBottom: Math.max(40, insets.bottom + 20)
+        }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
@@ -29,13 +34,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F7F7F7',
+    paddingBottom: 100,
+    paddingTop: 24,
   },
   scrollView: {
     flex: 1,
   },
-  scrollContent: {
-    paddingBottom: 40,
-  },
+ 
   content: {
     flex: 1,
     alignItems: 'center',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import Squircle from 'react-native-squircle';
+import { SquircleView } from 'react-native-figma-squircle';
 
 // Import the SVG icons as strings
 const basenameIconSvg = `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,14 +21,18 @@ const BasenameDialog: React.FC = () => {
   };
 
   return (
-    <Squircle
+    <SquircleView
       style={styles.squircleContainer}
-      borderRadius={20}
-      borderSmoothing={1}
-      backgroundColor="#ECECEC"
+      squircleParams={{
+        cornerRadius: 20,
+        cornerSmoothing: 1,
+        fillColor: '#ECECEC',
+      }}
     >
       <TouchableOpacity style={styles.container} onPress={handlePress}>
-        <SvgXml xml={basenameIconSvg} width={36} height={36} />
+        <View style={styles.iconContainer}>
+          <SvgXml xml={basenameIconSvg} width={36} height={36} />
+        </View>
         
         <View style={styles.textContainer}>
           <Text style={styles.title}>Get a basename</Text>
@@ -37,28 +41,36 @@ const BasenameDialog: React.FC = () => {
           </Text>
         </View>
         
-        <SvgXml xml={arrowUpIconSvg} width={18} height={18} />
+        <View style={styles.arrowContainer}>
+          <SvgXml xml={arrowUpIconSvg} width={18} height={18} />
+        </View>
       </TouchableOpacity>
-    </Squircle>
+    </SquircleView>
   );
 };
 
 const styles = StyleSheet.create({
   squircleContainer: {
     marginTop: 24,
+    width: '100%',
   },
   container: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     padding: 16,
-    gap: 8,
+    width: '100%',
+  },
+  iconContainer: {
+    marginRight: 8,
   },
   textContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    gap: 4,
     flex: 1,
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  arrowContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontFamily: 'System',
@@ -66,6 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     color: '#252525',
+    marginBottom: 4,
   },
   description: {
     fontFamily: 'System',

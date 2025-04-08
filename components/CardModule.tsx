@@ -194,14 +194,14 @@ const CardModule: React.FC<CardModuleProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
-    width: 354,
-    height: 246, // Added explicit height to container
+    width: '100%',
+    aspectRatio: 354/246,
+    alignSelf: 'stretch',
   },
   cardBaseContainer: {
     position: 'absolute',
-    width: 354,
-    height: 226,
+    width: '100%',
+    height: '92%', // Adjusted to maintain proportions
     zIndex: 1,
   },
   cardBasePlaceholder: {
@@ -210,14 +210,15 @@ const styles = StyleSheet.create({
   },
   walletBaseContainer: {
     position: 'absolute',
-    top: 8,
+    top: '3%',
+    width: '100%',
     zIndex: 2,
   },
   mainCard: {
     position: 'absolute',
-    top: 26,
-    width: 354,
-    height: 211,
+    top: '10.5%',
+    width: '100%',
+    height: '85.5%',
     zIndex: 3,
   },
   gradientFill: {
