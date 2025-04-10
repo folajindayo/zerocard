@@ -1,4 +1,4 @@
-import { Tabs, Redirect } from 'expo-router';
+import { Tabs, Redirect, Stack } from 'expo-router';
 import { View, StatusBar } from 'react-native';
 import { AuthBoundary } from '@privy-io/expo';
 import NavigationBar from '../../components/navigation/NavigationBar';
@@ -37,15 +37,19 @@ export default function TabLayout() {
           screenOptions={{
             headerShown: false,
             tabBarStyle: { display: 'none' }, // Hide the default tab bar
-            contentStyle: { backgroundColor: '#f7f7f7' },
+            contentStyle: { backgroundColor: '#f7f7f7', paddingHorizontal: 16 },
           }}
           // Use our custom NavigationBar
           tabBar={() => <NavigationBar />}
         >
           <Tabs.Screen
-            name="home/index"
+            name="home"
             options={{
               title: 'Home',
+              // This makes home/index.tsx the default for the "home" route
+              href: {
+                pathname: "home/index"
+              }
             }}
           />
           <Tabs.Screen

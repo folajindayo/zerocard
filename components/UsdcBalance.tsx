@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { AnimatedRollingNumber } from 'react-native-animated-rolling-numbers';
+import { Easing } from 'react-native-reanimated';
 
 // USDC SVG icon
 const usdcSvg = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,15 +16,24 @@ type UsdcBalanceProps = {
 };
 
 const UsdcBalance: React.FC<UsdcBalanceProps> = ({ amount = 0 }) => {
-  // Format the amount to always show 2 decimal places
-  const formattedAmount = amount.toFixed(2);
-  
   return (
     <View style={styles.balanceContainer}>
       <Text style={styles.balanceLabel}>Your card balance is</Text>
       <View style={styles.balanceRow}>
         <SvgXml xml={usdcSvg} width={23} height={23} />
-        <Text style={styles.balanceAmount}>{formattedAmount} USDC</Text>
+        <View style={styles.amountContainer}>
+          <AnimatedRollingNumber
+            value={amount}
+            textStyle={styles.balanceAmount}
+            useGrouping
+            toFixed={2}
+            spinningAnimationConfig={{
+              duration: 800,
+              easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+            }}
+          />
+          <Text style={[styles.balanceAmount, styles.currencyText]}> USDC</Text>
+        </View>
       </View>
     </View>
   );
@@ -47,6 +58,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
+  amountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   balanceAmount: {
     fontFamily: 'SF Pro Display',
     fontStyle: 'normal',
@@ -54,6 +69,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 29,
     color: '#000000',
+  },
+  currencyText: {
+    marginLeft: 4,
   },
 });
 

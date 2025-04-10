@@ -18,6 +18,7 @@ import CardStatusComponent from '../../../components/CardStatus';
 import UsernameModal from '../../../components/UsernameModal';
 import CardControls from '../../../components/CardControls';
 import TransactionItem from '../../../components/TransactionItem';
+import CardTypeModal from '../../../components/CardTypeModal';
 
 // Import mockdata
 import mockData from '../../../assets/mockdata.json';
@@ -82,6 +83,9 @@ export default function HomeScreen() {
   // State for username modal
   const [usernameModalVisible, setUsernameModalVisible] = useState(false);
   const [username, setUsername] = useState<string>('');
+  
+  // State for card type modal
+  const [cardTypeModalVisible, setCardTypeModalVisible] = useState(false);
 
   // Get username from state or email as fallback
   const displayName = username || (user?.email ? user.email.split('@')[0] : '');
@@ -121,8 +125,13 @@ export default function HomeScreen() {
 
   // Handlers for card status actions
   const handleOrderCard = () => {
-    // In a real app, this would call an API to order a card
-    console.log('Order card pressed');
+    // Show the card type selection modal
+    setCardTypeModalVisible(true);
+  };
+
+  const handleSelectCardType = (cardType: 'physical' | 'contactless') => {
+    // In a real app, this would call an API to order the selected card type
+    console.log(`${cardType} card ordered`);
     setUserStage('ordered_card');
   };
 
@@ -179,6 +188,13 @@ export default function HomeScreen() {
         onClose={() => setUsernameModalVisible(false)}
         onSetUsername={handleSetUsername}
         initialUsername={username}
+      />
+      
+      {/* Card Type Modal */}
+      <CardTypeModal
+        visible={cardTypeModalVisible}
+        onClose={() => setCardTypeModalVisible(false)}
+        onSelectCardType={handleSelectCardType}
       />
       
       {/* Fixed Header */}
