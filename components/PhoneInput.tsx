@@ -277,6 +277,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: '#A2A2A2',
     width: '100%',
+    paddingVertical: Platform.select({ android: 0 }),
   },
   filledInput: {
     color: '#121212',

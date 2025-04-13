@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ViewStyle, TextStyle, Platform } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { Button } from './Button';
 import { SquircleView } from 'react-native-figma-squircle';
+import AndroidCardTypeModal from './AndroidCardTypeModal';
 
 // Import SVG icons
 const cardNotFoundSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,6 +31,8 @@ const CardStatusComponent: React.FC<CardStatusProps> = ({
   onPrimaryButtonPress,
   onSecondaryButtonPress,
 }) => {
+  const [isModalVisible, setModalVisible] = useState(false);
+
   // Content based on status
   const iconSvg = status === 'not_found' ? cardNotFoundSvg : cardSendSvg;
   
@@ -48,42 +51,68 @@ const CardStatusComponent: React.FC<CardStatusProps> = ({
   const secondaryButtonTitle = status === 'not_found' 
     ? 'Load wallet' 
     : 'Check status';
+
+  const handlePrimaryButtonPress = () => {
+    if (status === 'not_found' && Platform.OS === 'android') {
+      setModalVisible(true);
+    } else if (onPrimaryButtonPress) {
+      onPrimaryButtonPress();
+    }
+  };
+
+  const handleCardTypeSelection = (cardType: 'physical' | 'contactless') => {
+    setModalVisible(false);
+    // Only physical card is selectable for now
+    if (cardType === 'physical' && onPrimaryButtonPress) {
+      onPrimaryButtonPress();
+    }
+  };
   
   return (
-    <SquircleView
-      style={styles.container as ViewStyle}
-      squircleParams={{
-        cornerSmoothing: 1,
-        cornerRadius: 20,
-        fillColor: '#ECECEC',
-      }}
-    >
-      <View style={styles.contentContainer as ViewStyle}>
-        <View style={styles.headerContainer as ViewStyle}>
-          <View style={styles.titleContainer as ViewStyle}>
-            <SvgXml xml={iconSvg} width={24} height={24} />
-            <Text style={styles.title as TextStyle}>{title}</Text>
+    <>
+      <SquircleView
+        style={styles.container as ViewStyle}
+        squircleParams={{
+          cornerSmoothing: 1,
+          cornerRadius: 20,
+          fillColor: '#ECECEC',
+        }}
+      >
+        <View style={styles.contentContainer as ViewStyle}>
+          <View style={styles.headerContainer as ViewStyle}>
+            <View style={styles.titleContainer as ViewStyle}>
+              <SvgXml xml={iconSvg} width={24} height={24} />
+              <Text style={styles.title as TextStyle}>{title}</Text>
+            </View>
+            
+            <Text style={styles.description as TextStyle}>{description}</Text>
           </View>
           
-          <Text style={styles.description as TextStyle}>{description}</Text>
+          <View style={styles.buttonContainer as ViewStyle}>
+            <Button 
+              title={secondaryButtonTitle} 
+              variant="secondary"
+              style={styles.button as ViewStyle}
+              onPress={onSecondaryButtonPress}
+            />
+            <Button 
+              title={primaryButtonTitle} 
+              variant="primary"
+              style={styles.button as ViewStyle}
+              onPress={handlePrimaryButtonPress}
+            />
+          </View>
         </View>
-        
-        <View style={styles.buttonContainer as ViewStyle}>
-          <Button 
-            title={secondaryButtonTitle} 
-            variant="secondary"
-            style={styles.button as ViewStyle}
-            onPress={onSecondaryButtonPress}
-          />
-          <Button 
-            title={primaryButtonTitle} 
-            variant="primary"
-            style={styles.button as ViewStyle}
-            onPress={onPrimaryButtonPress}
-          />
-        </View>
-      </View>
-    </SquircleView>
+      </SquircleView>
+
+      {Platform.OS === 'android' && (
+        <AndroidCardTypeModal
+          visible={isModalVisible}
+          onClose={() => setModalVisible(false)}
+          onSelectCardType={handleCardTypeSelection}
+        />
+      )}
+    </>
   );
 };
 

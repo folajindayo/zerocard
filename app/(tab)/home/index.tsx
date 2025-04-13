@@ -6,19 +6,23 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Platform,
 } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { usePrivy } from '@privy-io/expo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import GreetingHeader from '../../../components/GreetingHeader';
 import UsdcBalance from '../../../components/UsdcBalance';
 import CardModule from '../../../components/CardModule';
 import CardStatusComponent from '../../../components/CardStatus';
-import UsernameModal from '../../../components/UsernameModal';
+import UsernameModal from '../../../components/modal/UsernameModal';
+import AndroidUsernameModal from '../../../components/AndroidUsernameModal';
 import CardControls from '../../../components/CardControls';
 import TransactionItem from '../../../components/TransactionItem';
-import CardTypeModal from '../../../components/CardTypeModal';
+import CardTypeModal from '../../../components/modal/CardTypeModal';
+import SpendingLimitDialog from '../../../components/SpendingLimitDialog';
 
 // Import mockdata
 import mockData from '../../../assets/mockdata.json';
@@ -29,49 +33,51 @@ const profileIcon = require('../../../assets/prrofile-icon.png');
 // User onboarding stages
 type UserStage = 'new_user' | 'ordered_card' | 'activated_card' | 'has_transactions';
 
-// Mock transaction data with type
-const mockTransactions = [
-  {
-    id: '1',
-    type: 'spend' as const,
-    name: 'Starbucks',
-    date: 'Today',
-    time: '9:30am',
-    amount: 24.50,
-    currency: 'USDC',
-    category: 'Food'
-  },
-  {
-    id: '2',
-    type: 'spend' as const,
-    name: 'Uber',
-    date: 'Yesterday',
-    time: '6:45pm',
-    amount: 15.75,
-    currency: 'USDC',
-    category: 'Transportation'
-  },
-  {
-    id: '3',
-    type: 'deposit' as const,
-    name: 'Salary Deposit',
-    date: 'Jun 25',
-    time: '10:00am',
-    amount: 2750.00,
-    currency: 'USDC',
-    category: 'Income'
-  },
-  {
-    id: '4',
-    type: 'spend' as const,
-    name: 'Amazon',
-    date: 'Jun 23',
-    time: '2:20pm',
-    amount: 67.99,
-    currency: 'USDC',
-    category: 'Shopping'
+// Generate random transactions
+const generateRandomTransactions = () => {
+  const transactionTypes = ['deposit', 'spend', 'withdraw'] as const;
+  const merchantNames = [
+    'Starbucks', 'Uber', 'Amazon', 'Netflix', 'Walmart', 
+    'Target', 'Apple Store', 'Spotify', 'DoorDash', 'Nike', 
+    'Trader Joe\'s', 'Whole Foods', 'Best Buy', 'GameStop'
+  ];
+  const dates = ['Today', 'Yesterday', 'Jun 28', 'Jun 27', 'Jun 25', 'Jun 23', 'Jun 21'];
+  const times = ['9:30am', '10:45am', '1:15pm', '3:30pm', '6:45pm', '8:20pm'];
+  const categories = ['Food', 'Transportation', 'Shopping', 'Entertainment', 'Groceries', 'Technology'];
+  
+  // Random number between min and max
+  const randomInt = (min: number, max: number) => {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  };
+  
+  // Generate 5-8 random transactions
+  const count = randomInt(5, 8);
+  const transactions = [];
+  
+  for (let i = 0; i < count; i++) {
+    const type = transactionTypes[randomInt(0, transactionTypes.length - 1)];
+    
+    const transaction = {
+      id: `${i + 1}`,
+      type,
+      name: merchantNames[randomInt(0, merchantNames.length - 1)],
+      date: dates[randomInt(0, dates.length - 1)],
+      time: times[randomInt(0, times.length - 1)],
+      amount: type === 'deposit' ? 
+        parseFloat((randomInt(50, 3000) + Math.random()).toFixed(2)) : 
+        parseFloat((randomInt(5, 500) + Math.random()).toFixed(2)),
+      currency: 'USDC',
+      category: categories[randomInt(0, categories.length - 1)]
+    };
+    
+    transactions.push(transaction);
   }
-];
+  
+  return transactions;
+};
+
+// Mock transaction data with type
+const mockTransactions = generateRandomTransactions();
 
 export default function HomeScreen() {
   const { user, logout } = usePrivy() as any;
@@ -84,29 +90,87 @@ export default function HomeScreen() {
   const [usernameModalVisible, setUsernameModalVisible] = useState(false);
   const [username, setUsername] = useState<string>('');
   
+  // State for Android username modal
+  const [androidUsernameModalVisible, setAndroidUsernameModalVisible] = useState(false);
+  
   // State for card type modal
   const [cardTypeModalVisible, setCardTypeModalVisible] = useState(false);
+
+  // State for transactions
+  const [transactions, setTransactions] = useState(mockTransactions);
+
+  // Load saved state from AsyncStorage
+  useEffect(() => {
+    const loadSavedState = async () => {
+      try {
+        // Check if user is verified
+        const userVerified = await AsyncStorage.getItem('user_verified');
+        const cardOrdered = await AsyncStorage.getItem('card_ordered');
+        const savedUsername = await AsyncStorage.getItem('username');
+        
+        // If we have a saved username, use it
+        if (savedUsername) {
+          setUsername(savedUsername);
+        }
+        
+        // If card was ordered, update the stage
+        if (cardOrdered === 'true') {
+          setUserStage('ordered_card');
+        }
+        
+      } catch (error) {
+        console.error('Error loading saved state:', error);
+      }
+    };
+    
+    loadSavedState();
+  }, []);
 
   // Get username from state or email as fallback
   const displayName = username || (user?.email ? user.email.split('@')[0] : '');
   const userInitial = displayName && displayName.length > 0 ? displayName[0].toUpperCase() : 'U';
 
-  // Open username modal automatically for new users after 1 second
+  // On Android, show Android username modal when in new_user stage
   useEffect(() => {
-    if (userStage === 'new_user') {
+    if (Platform.OS === 'android' && userStage === 'new_user' && !username) {
+      setAndroidUsernameModalVisible(true);
+    }
+  }, [userStage, username]);
+
+  // Open username modal automatically for new users after 1 second (iOS only)
+  useEffect(() => {
+    if (userStage === 'new_user' && Platform.OS === 'ios' && !username) {
       const timer = setTimeout(() => {
         setUsernameModalVisible(true);
       }, 1000);
       
       return () => clearTimeout(timer);
     }
-  }, [userStage]);
+  }, [userStage, username]);
   
   // Handle username setup
-  const handleSetUsername = (newUsername: string) => {
+  const handleSetUsername = async (newUsername: string) => {
     setUsername(newUsername);
     setUsernameModalVisible(false);
-    // In a real app, you would save this to user profile/backend
+    setAndroidUsernameModalVisible(false);
+    
+    // Save username to AsyncStorage
+    try {
+      await AsyncStorage.setItem('username', newUsername);
+      await AsyncStorage.setItem('user_verified', 'true');
+    } catch (error) {
+      console.error('Error saving username:', error);
+    }
+  };
+
+  // Handle profile press - on Android, show username modal
+  const handleProfilePress = () => {
+    if (Platform.OS === 'android') {
+      setAndroidUsernameModalVisible(true);
+    } else {
+      // On iOS, profile press logs out
+      handleLogout();
+    }
   };
 
   // If no user, redirect to root
@@ -116,6 +180,8 @@ export default function HomeScreen() {
 
   const handleLogout = async () => {
     try {
+      // Clear any saved state on logout
+      await AsyncStorage.multiRemove(['username', 'user_verified', 'card_ordered', 'identity_type']);
       await logout();
       // No need for navigation here - the Redirect will handle it
     } catch (error) {
@@ -129,10 +195,17 @@ export default function HomeScreen() {
     setCardTypeModalVisible(true);
   };
 
-  const handleSelectCardType = (cardType: 'physical' | 'contactless') => {
+  const handleSelectCardType = async (cardType: 'physical' | 'contactless') => {
     // In a real app, this would call an API to order the selected card type
     console.log(`${cardType} card ordered`);
     setUserStage('ordered_card');
+    
+    // Save ordered state
+    try {
+      await AsyncStorage.setItem('card_ordered', 'true');
+    } catch (error) {
+      console.error('Error saving card ordered state:', error);
+    }
   };
 
   const handleLoadWallet = () => {
@@ -175,20 +248,40 @@ export default function HomeScreen() {
   const toggleTransactionState = () => {
     if (userStage === 'activated_card') {
       setUserStage('has_transactions');
+      // Generate new random transactions when showing transactions
+      setTransactions(generateRandomTransactions());
     } else if (userStage === 'has_transactions') {
       setUserStage('activated_card');
     }
   };
 
+  // Handle spending limit dialog press
+  const handleSpendingLimitPress = () => {
+    console.log('Navigating to spending limit screen');
+    router.push('/(app)/spending-limit');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Username Modal */}
-      <UsernameModal
-        visible={usernameModalVisible}
-        onClose={() => setUsernameModalVisible(false)}
-        onSetUsername={handleSetUsername}
-        initialUsername={username}
-      />
+      {/* Username Modal - only on iOS */}
+      {Platform.OS === 'ios' && (
+        <UsernameModal
+          visible={usernameModalVisible}
+          onClose={() => setUsernameModalVisible(false)}
+          onSetUsername={handleSetUsername}
+          initialUsername={username}
+        />
+      )}
+      
+      {/* Android Username Modal */}
+      {Platform.OS === 'android' && (
+        <AndroidUsernameModal
+          visible={androidUsernameModalVisible}
+          onClose={() => setAndroidUsernameModalVisible(false)}
+          onSetUsername={handleSetUsername}
+          initialUsername={username}
+        />
+      )}
       
       {/* Card Type Modal */}
       <CardTypeModal
@@ -202,7 +295,7 @@ export default function HomeScreen() {
         <GreetingHeader 
           username={displayName}
           profileImage={profileIcon}
-          onProfilePress={handleLogout}
+          onProfilePress={handleProfilePress}
         />
       </View>
       
@@ -242,10 +335,20 @@ export default function HomeScreen() {
               onLoadCard={() => {
                 console.log('Load card pressed');
               }}
+              onWithdraw={() => {
+                console.log('Withdraw pressed');
+              }}
               onFreezeCard={() => {
                 console.log('Freeze card pressed');
               }}
             />
+          </View>
+        )}
+        
+        {/* Spending Limit Dialog - Only show for users with activated cards */}
+        {(userStage === 'activated_card' || userStage === 'has_transactions') && (
+          <View style={styles.spendingLimitContainer}>
+            <SpendingLimitDialog onPress={handleSpendingLimitPress} />
           </View>
         )}
 
@@ -259,7 +362,7 @@ export default function HomeScreen() {
             
             {/* Show transactions or empty state based on user stage */}
             {userStage === 'has_transactions' ? (
-              mockTransactions.map(transaction => (
+              transactions.map(transaction => (
                 <TransactionItem
                   key={transaction.id}
                   id={transaction.id}
@@ -312,6 +415,7 @@ const styles = StyleSheet.create({
   scrollContentContainer: {
     padding: 16,
     paddingTop: 16,
+    paddingBottom: 100,
   },
   cardModuleContainer: {
     marginTop: 16,
@@ -339,7 +443,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   cardStatusContainer: {
-    marginTop: 8, // 16px gap between CardModule and CardStatus
+    marginTop: Platform.select({
+      android: 32,
+      ios: 8,
+      default: 8,
+    }),
     marginBottom: 8,
   },
   emptyTransactionsContainer: {
@@ -354,8 +462,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cardControlsContainer: {
-    marginTop: 8,
-    marginBottom: 16,
+    marginTop: Platform.select({
+      android: 32,
+      ios: 16,
+      default: 8
+    }),
+    marginBottom: Platform.select({
+      android: 12,
+      ios: 16,
+      default: 8
+    }),
     alignItems: 'center',
   },
   toggleButton: {
@@ -372,5 +488,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#000000',
     textAlign: 'center',
+  },
+  spendingLimitContainer: {
+    marginTop: 0, // 16px gap from CardControls
+    marginBottom: 16,
   },
 }); 

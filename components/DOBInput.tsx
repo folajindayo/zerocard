@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 20,
     color: '#A2A2A2',
-    width: 44,
+    width: Platform.select({ ios: 44, android: 55 }),
     textAlign: 'center',
   },
   monthInput: {
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 20,
     color: '#A2A2A2',
-    width: 29,
+    width: Platform.select({ ios: 29, android: 40 }),
     textAlign: 'center',
   },
   dayInput: {
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 20,
     color: '#A2A2A2',
-    width: 24,
+    width: Platform.select({ ios: 24, android: 35 }),
     textAlign: 'center',
   },
   dateSeparator: {

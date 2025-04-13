@@ -1,20 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
+  Modal, 
   View, 
   Text, 
   StyleSheet, 
-  Modal, 
-  TouchableOpacity, 
   Dimensions,
-  Animated,
-  Easing
+  TouchableWithoutFeedback,
+  Platform,
+  TouchableOpacity,
 } from 'react-native';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  withTiming,
+  Easing
+} from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
-import { SquircleView } from 'react-native-figma-squircle';
-import BlurBackground from './BlurBackground';
+import { Button } from './Button';
 import { router } from 'expo-router';
 
-// SVG icons as strings
+// Import SVG icons
 const physicalCardSvg = `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="36" height="36" rx="18" fill="#E5E5E5"/>
 <path d="M12 25H24C26.2 25 28 23.2 28 21V15C28 12.8 26.2 11 24 11L12 11C9.8 11 8 12.8 8 15L8 21C8 23.2 9.8 25 12 25ZM12 13L24 13C25.1 13 26 13.9 26 15L10 15C10 13.9 10.9 13 12 13ZM10 17L26 17V21C26 22.1 25.1 23 24 23H12C10.9 23 10 22.1 10 21L10 17Z" fill="#9C9C9C"/>
@@ -22,7 +28,7 @@ const physicalCardSvg = `<svg width="36" height="36" viewBox="0 0 36 36" fill="n
 <path d="M23 22C23.5523 22 24 21.5523 24 21C24 20.4477 23.5523 20 23 20C22.4477 20 22 20.4477 22 21C22 21.5523 22.4477 22 23 22Z" fill="#9C9C9C"/>
 </svg>`;
 
-const contactlessIconSvg = `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+const contactlessSvg = `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_305_1170)">
 <rect width="36" height="36" rx="18" fill="#D4D4D4"/>
 <path d="M12.1666 27.3333C12.1666 26.0465 13.2131 25 14.4999 25H21.4999C22.7868 25 23.8333 26.0465 23.8333 27.3333V36.6666H26.1666V27.3333C26.1666 24.7601 24.0731 22.6666 21.4999 22.6666H14.4999C11.9267 22.6666 9.83325 24.7601 9.83325 27.3333V36.6666H12.1666V27.3333Z" fill="#9C9C9C"/>
@@ -36,7 +42,7 @@ const contactlessIconSvg = `<svg width="36" height="36" viewBox="0 0 36 36" fill
 </defs>
 </svg>`;
 
-const colorWheelIconSvg = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+const colorWheelSvg = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M11.0453 11.652C11.489 12.1809 11.4239 12.9831 10.8147 13.3079C10.3173 13.5731 9.78494 13.7668 9.23344 13.8835C8.55806 14.0263 7.99244 13.4536 7.99237 12.7633L7.99219 10.4416C7.99219 10.0946 8.28169 9.82337 8.60775 9.70474C8.93375 9.58605 9.32987 9.60762 9.55288 9.87343L11.0453 11.652Z" fill="#662D91"/>
 <path d="M7.99186 12.7632C7.99186 13.4535 7.4263 14.0263 6.75086 13.8835C6.19936 13.7669 5.66704 13.5731 5.16961 13.308C4.56036 12.9833 4.49524 12.181 4.93892 11.6522L6.43117 9.87349C6.65417 9.60767 7.05024 9.58605 7.3763 9.70467C7.70236 9.8233 7.99186 10.0945 7.99186 10.4415V12.7632Z" fill="#C1272D"/>
 <path d="M3.31422 8.83802C2.63435 8.9579 1.97216 8.50034 1.99547 7.8104C2.01452 7.24702 2.11286 6.68914 2.2876 6.15321C2.5016 5.4969 3.28041 5.29334 3.87822 5.63846L5.88903 6.79921C6.18953 6.97271 6.27966 7.35902 6.21941 7.70071C6.15916 8.0424 5.94241 8.37459 5.60066 8.43484L3.31422 8.83802Z" fill="#E86110"/>
@@ -48,101 +54,74 @@ const colorWheelIconSvg = `<svg width="16" height="16" viewBox="0 0 16 16" fill=
 <path d="M6.36748 3.54975C6.13135 2.901 6.46698 2.16943 7.15048 2.07262C7.7086 1.99355 8.27509 1.99353 8.83323 2.07256C9.51679 2.16931 9.85241 2.90093 9.61635 3.54962L8.82241 5.73144C8.70379 6.0575 8.33898 6.21331 7.99198 6.21331C7.64504 6.21331 7.28023 6.05756 7.16154 5.73144L6.36748 3.54975Z" fill="#FDB62F"/>
 </svg>`;
 
-interface CardTypeModalProps {
+interface AndroidCardTypeModalProps {
   visible: boolean;
   onClose: () => void;
   onSelectCardType: (cardType: 'physical' | 'contactless') => void;
 }
 
-const CardTypeModal: React.FC<CardTypeModalProps> = ({
+const AndroidCardTypeModal: React.FC<AndroidCardTypeModalProps> = ({
   visible,
   onClose,
-  onSelectCardType,
+  onSelectCardType
 }) => {
+  const { height } = Dimensions.get('window');
+  
   // Animation values
-  const opacity = React.useRef(new Animated.Value(0)).current;
-  const translateY = React.useRef(new Animated.Value(100)).current;
-  const { width } = Dimensions.get('window');
-
-  // Handle animations when visibility changes
-  React.useEffect(() => {
+  const translateY = useSharedValue(height);
+  const opacity = useSharedValue(0);
+  
+  // Handle animation when visibility changes
+  useEffect(() => {
     if (visible) {
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
-        }),
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
-        })
-      ]).start();
+      opacity.value = withTiming(1, { duration: 300 });
+      translateY.value = withSpring(0, { 
+        damping: 15,
+        stiffness: 100
+      });
     } else {
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
-        }),
-        Animated.timing(translateY, {
-          toValue: 100,
-          duration: 200,
-          useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
-        })
-      ]).start();
+      opacity.value = withTiming(0, { duration: 200 });
+      translateY.value = withSpring(height, {
+        damping: 15,
+        stiffness: 100
+      });
     }
-  }, [visible, opacity, translateY]);
+  }, [visible, height]);
+  
+  // Animated styles
+  const backdropStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
+  
+  const modalStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: translateY.value }],
+    };
+  });
 
-  const handleSelectPhysicalCard = () => {
-    onSelectCardType('physical');
-    onClose();
-    // Navigate to order-card page with correct path
-    router.push("/home/order-card");
-  };
-
+  // Only show on Android
+  if (Platform.OS !== 'android') {
+    return null;
+  }
+  
   return (
     <Modal
       transparent
       visible={visible}
       animationType="none"
+      statusBarTranslucent={true}
       onRequestClose={onClose}
     >
-      <BlurBackground visible={visible} intensity={40} tint="dark" />
-      
-      <TouchableOpacity 
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={onClose}
-      >
-        <Animated.View 
-          style={[
-            styles.modalAnimatedContainer,
-            {
-              left: (width - 354) / 2, // Center horizontally
-              opacity,
-              transform: [{ translateY }]
-            }
-          ]}
-        >
-          <SquircleView
-            style={styles.modalContainer}
-            squircleParams={{
-              cornerSmoothing: 1,
-              cornerRadius: 30,
-              fillColor: '#F7F7F7',
-            }}
-          >
-            <TouchableOpacity 
-              activeOpacity={1} 
-              onPress={(e) => e.stopPropagation()}
-              style={styles.modalTouchable}
-            >
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.container}>
+          {/* Backdrop */}
+          <Animated.View style={[styles.backdrop, backdropStyle]} />
+          
+          {/* Modal Content */}
+          <Animated.View style={[styles.modalAnimatedContainer, modalStyle]}>
+            <View style={styles.modalContainer}>
               <View style={styles.headerContainer}>
                 <Text style={styles.title}>Select card type</Text>
                 <Text style={styles.subtitle}>Choose the type of card you'd like to own</Text>
@@ -151,96 +130,77 @@ const CardTypeModal: React.FC<CardTypeModalProps> = ({
               <View style={styles.cardOptionsContainer}>
                 {/* Physical Card Option */}
                 <TouchableOpacity 
-                  style={styles.cardOption} 
-                  onPress={handleSelectPhysicalCard}
+                  style={styles.cardOption}
+                  onPress={() => {
+                    onSelectCardType('physical');
+                    onClose();
+                    // For Android, navigate to order-card as a modal
+                    router.push("/(tab)/home/order-card");
+                  }}
                 >
-                  <SquircleView
-                    style={styles.cardOptionInner}
-                    squircleParams={{
-                      cornerSmoothing: 1,
-                      cornerRadius: 20,
-                      fillColor: '#FFFFFF',
-                    }}
-                  >
-                    <SvgXml xml={physicalCardSvg} width={36} height={36} />
-                    
-                    <View style={styles.cardOptionContent}>
-                      <Text style={styles.cardOptionTitle}>Physical card</Text>
-                      <Text style={styles.cardOptionDescription}>
-                        Only supports usage in Nigeria, supports ATM, Web, POS transactions
-                      </Text>
-                    </View>
-                  </SquircleView>
+                  <SvgXml xml={physicalCardSvg} width={36} height={36} />
+                  <View style={styles.cardOptionContent}>
+                    <Text style={styles.cardOptionTitle}>Physical card</Text>
+                    <Text style={styles.cardOptionDescription}>
+                      Only supports usage in Nigeria, supports ATM, Web, POS transactions
+                    </Text>
+                  </View>
                 </TouchableOpacity>
                 
-                {/* Contactless Card Option (Disabled) */}
-                <TouchableOpacity style={styles.cardOptionDisabled} disabled>
-                  <SquircleView
-                    style={styles.cardOptionInner}
-                    squircleParams={{
-                      cornerSmoothing: 1,
-                      cornerRadius: 20,
-                      fillColor: '#E5E5E5',
-                    }}
-                  >
-                    <SvgXml xml={contactlessIconSvg} width={36} height={36} />
-                    
-                    <View style={styles.cardOptionContent}>
-                      <View style={styles.contactlessHeaderRow}>
-                        <Text style={styles.cardOptionTitleDisabled}>Contactless</Text>
-                        
-                        <View style={styles.comingSoonBadge}>
-                          <Text style={styles.comingSoonText}>Coming soon</Text>
-                        </View>
-                      </View>
-                      
-                      <Text style={styles.cardOptionDescriptionDisabled}>
-                        Supports worldwide usage and transactions. Add your card to digital wallets
-                      </Text>
-                      
-                      <View style={styles.customizableBadge}>
-                        <SvgXml xml={colorWheelIconSvg} width={16} height={16} />
-                        <Text style={styles.customizableText}>Customizable</Text>
+                {/* Contactless Card Option - Disabled */}
+                <View style={[styles.cardOption, styles.disabledCardOption]}>
+                  <SvgXml xml={contactlessSvg} width={36} height={36} />
+                  <View style={styles.cardOptionContent}>
+                    <View style={styles.contactlessHeaderContainer}>
+                      <Text style={styles.disabledCardOptionTitle}>Contactless</Text>
+                      <View style={styles.comingSoonTag}>
+                        <Text style={styles.comingSoonText}>Coming soon</Text>
                       </View>
                     </View>
-                  </SquircleView>
-                </TouchableOpacity>
+                    <Text style={styles.disabledCardOptionDescription}>
+                      Supports worldwide usage and transactions. Add your card to digital wallets
+                    </Text>
+                    <View style={styles.customizableTag}>
+                      <SvgXml xml={colorWheelSvg} width={16} height={16} />
+                      <Text style={styles.customizableText}>Customizable</Text>
+                    </View>
+                  </View>
+                </View>
               </View>
-            </TouchableOpacity>
-          </SquircleView>
-        </Animated.View>
-      </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
+  container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
   modalAnimatedContainer: {
-    position: 'absolute',
-    top: 422, // Positioning as specified in design
-    width: 354,
+    width: '92%',
+    marginBottom: 40,
   },
   modalContainer: {
     width: '100%',
-  },
-  modalTouchable: {
     padding: 32,
-    paddingHorizontal: 24,
-    flexDirection: 'column',
-    justifyContent: 'center',
+    paddingBottom: 32,
     alignItems: 'flex-start',
+    backgroundColor: '#F7F7F7',
+    borderRadius: 30,
     gap: 24,
   },
   headerContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: 8,
     alignSelf: 'stretch',
+    gap: 8,
   },
   title: {
     fontFamily: 'SF Pro Text',
@@ -257,37 +217,31 @@ const styles = StyleSheet.create({
     color: '#767676',
   },
   cardOptionsContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: 16,
     alignSelf: 'stretch',
+    gap: 16,
   },
   cardOption: {
-    alignSelf: 'stretch',
-  },
-  cardOptionDisabled: {
-    alignSelf: 'stretch',
-    opacity: 1, // We're using specific disabled colors instead
-  },
-  cardOptionInner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     padding: 16,
     gap: 8,
-    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: 'rgba(0, 0, 0, 0.05)',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  disabledCardOption: {
+    backgroundColor: '#E5E5E5',
   },
   cardOptionContent: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    gap: 8,
     flex: 1,
-  },
-  contactlessHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: 8,
-    width: '100%',
   },
   cardOptionTitle: {
     fontFamily: 'SF Pro Text',
@@ -296,7 +250,7 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     color: '#252525',
   },
-  cardOptionTitleDisabled: {
+  disabledCardOptionTitle: {
     fontFamily: 'SF Pro Text',
     fontWeight: '600',
     fontSize: 16,
@@ -310,22 +264,27 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: '#767676',
   },
-  cardOptionDescriptionDisabled: {
+  disabledCardOptionDescription: {
     fontFamily: 'SF Pro Text',
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 17,
     color: '#8A8A8A',
   },
-  comingSoonBadge: {
+  contactlessHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  comingSoonTag: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 2,
     paddingHorizontal: 8,
     borderWidth: 1,
-    borderStyle: 'dashed',
     borderColor: '#8A8A8A',
+    borderStyle: 'dashed',
     borderRadius: 10000,
   },
   comingSoonText: {
@@ -336,7 +295,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#8A8A8A',
   },
-  customizableBadge: {
+  customizableTag: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -345,6 +304,7 @@ const styles = StyleSheet.create({
     gap: 4,
     backgroundColor: '#DADADA',
     borderRadius: 100000,
+    alignSelf: 'flex-start',
   },
   customizableText: {
     fontFamily: 'SF Pro Text',
@@ -355,4 +315,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CardTypeModal; 
+export default AndroidCardTypeModal; 

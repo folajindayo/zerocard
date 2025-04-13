@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CryptoDepositModal from '../components/CryptoDepositModal';
+import CryptoDepositModal from '../components/modal/CryptoDepositModal';
 
 // Define the transaction type
 interface Transaction {

@@ -1,4 +1,4 @@
-import { Tabs, Redirect, Stack } from 'expo-router';
+import { Tabs, Redirect, Stack, usePathname } from 'expo-router';
 import { View, StatusBar } from 'react-native';
 import { AuthBoundary } from '@privy-io/expo';
 import NavigationBar from '../../components/navigation/NavigationBar';
@@ -25,6 +25,12 @@ function ErrorScreen({ error }: { error: Error }) {
 }
 
 export default function TabLayout() {
+  const pathname = usePathname();
+  
+  // Check if we should hide the tab bar for certain routes
+  const hideTabBar = pathname.includes('/order-card') || 
+                     pathname.includes('/order-confirmation');
+  
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
@@ -39,8 +45,8 @@ export default function TabLayout() {
             tabBarStyle: { display: 'none' }, // Hide the default tab bar
             contentStyle: { backgroundColor: '#f7f7f7', paddingHorizontal: 16 },
           }}
-          // Use our custom NavigationBar
-          tabBar={() => <NavigationBar />}
+          // Use our custom NavigationBar only if not hiding
+          tabBar={hideTabBar ? () => null : () => <NavigationBar />}
         >
           <Tabs.Screen
             name="home"

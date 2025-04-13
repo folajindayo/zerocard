@@ -139,7 +139,7 @@ const CardModule: React.FC<CardModuleProps> = ({
       
       {/* Wallet Base (Middle Layer) */}
       <View style={styles.walletBaseContainer}>
-        <SvgXml xml={walletBaseSvg} />
+        <SvgXml xml={walletBaseSvg} width="100%" height="100%" />
       </View>
       
       {/* Main Card (Top Layer) */}
@@ -210,8 +210,12 @@ const styles = StyleSheet.create({
   },
   walletBaseContainer: {
     position: 'absolute',
-    top: '3%',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     width: '100%',
+    height: '100%',
     zIndex: 2,
   },
   mainCard: {

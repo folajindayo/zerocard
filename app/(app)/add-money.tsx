@@ -3,9 +3,9 @@ import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import AddMoney from '../../components/AddMoney';
-import CryptoDepositModal from '../../components/CryptoDepositModal';
-import UsernameModal from '../../components/UsernameModal';
+import UsernameModal from '../../components/modal/UsernameModal';
 import { Button } from '../../components/Button';
+import CryptoDepositModal from '../../components/modal/CryptoDepositModal';
 
 export default function AddMoneyScreen() {
   const router = useRouter();

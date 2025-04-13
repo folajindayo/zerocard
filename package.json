@@ -17,6 +17,7 @@
   "dependencies": {
     "@ethersproject/shims": "^5.8.0",
     "@expo-google-fonts/inter": "^0.3.0",
+    "@expo/vector-icons": "^14.0.2",
     "@privy-io/expo": "^0.50.0",
     "@privy-io/expo-native-extensions": "^0.0.4",
     "@privy-io/public-api": "^2.20.5",
@@ -43,6 +44,7 @@
     "expo-linking": "~6.3.1",
     "expo-local-authentication": "~15.0.2",
     "expo-media-library": "~17.0.6",
+    "expo-navigation-bar": "~4.0.9",
     "expo-network": "~7.0.5",
     "expo-router": "~4.0.6",
     "expo-screen-capture": "~7.0.1",
@@ -57,6 +59,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.1",
+    "react-native-animated-numbers": "^0.6.3",
     "react-native-animated-rolling-numbers": "^2.0.0",
     "react-native-detect-screenshot": "^1.2.1",
     "react-native-figma-squircle": "^0.4.0",

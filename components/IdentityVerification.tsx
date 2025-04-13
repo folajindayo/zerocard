@@ -17,6 +17,8 @@ import { SvgXml } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import * as LocalAuthentication from 'expo-local-authentication';
 import LoadingSpinner from './LoadingSpinner';
+import { router } from 'expo-router';
+import OrderConfirmation from './OrderConfirmation';
 
 // Import close icon SVG
 const closeIconSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -263,6 +265,22 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
+      // Skip biometric auth on Android
+      if (Platform.OS === 'android') {
+        // Directly proceed with verification on Android
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        onVerify(selectedIdentity, identityNumber);
+        // Navigate to the dedicated order-confirmation screen
+        router.replace({
+          pathname: "/(tab)/home/order-confirmation",
+          params: { 
+            identity: selectedIdentity 
+          }
+        });
+        return;
+      }
+
+      // Only run biometric auth on iOS
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
@@ -281,6 +299,13 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
       if (result.success) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         onVerify(selectedIdentity, identityNumber);
+        // Navigate to the dedicated order-confirmation screen
+        router.replace({
+          pathname: "/(tab)/home/order-confirmation",
+          params: { 
+            identity: selectedIdentity 
+          }
+        });
       } else {
         Alert.alert('Authentication Failed', result.error === 'user_cancel' ? 'Authentication cancelled.' : 'Biometric authentication failed.');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -303,9 +328,9 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-      keyboardVerticalOffset={100}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+      style={[styles.container, { backgroundColor: '#1F1F1F' }]}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
     >
       <ScrollView 
         style={styles.scrollContainer}
@@ -657,6 +682,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     color: '#FFFFFF',
+    paddingVertical: Platform.select({ android: 0 }),
   },
   dropdownContainer: {
     ...StyleSheet.absoluteFillObject,

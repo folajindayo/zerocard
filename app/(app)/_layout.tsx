@@ -50,6 +50,16 @@ export default function AppLayout() {
               title: 'Authentication',
             }}
           />
+          <Stack.Screen
+            name="spending-limit"
+            options={{
+              title: 'Spending Limit',
+              contentStyle: { 
+                backgroundColor: '#1f1f1f', 
+                paddingHorizontal: 16 
+              },
+            }}
+          />
         </Stack>
       </AuthBoundary>
     </SafeAreaProvider>

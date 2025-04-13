@@ -13,7 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import { SquircleView } from 'react-native-figma-squircle';
-import BlurBackground from './BlurBackground';
+import BlurBackground from '../BlurBackground';
 
 interface CryptoDepositModalProps {
   visible: boolean;
@@ -135,7 +135,7 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
                     <SvgXml xml={usdcSvg} width={48} height={48} />
                     <View style={styles.usdcIcon}>
                       <Image 
-                        source={require('../assets/received-icon.png')} 
+                        source={require('../../assets/received-icon.png')} 
                         style={styles.receivedIcon} 
                       />
                     </View>
@@ -166,7 +166,7 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
                       <Text style={styles.detailLabel}>Chain</Text>
                       <View style={styles.chainValue}>
                         <Image 
-                          source={require('../assets/base-logo-in-blue.png')} 
+                          source={require('../../assets/base-logo-in-blue.png')} 
                           style={styles.chainLogo} 
                         />
                         <Text style={styles.detailValue}>{chain}</Text>

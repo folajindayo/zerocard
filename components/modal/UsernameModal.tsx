@@ -14,8 +14,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SquircleView } from 'react-native-figma-squircle';
-import LoadingSpinner from './LoadingSpinner';
-import BlurBackground from './BlurBackground';
+import LoadingSpinner from '../LoadingSpinner';
+import BlurBackground from '../BlurBackground';
 import * as Haptics from 'expo-haptics';
 
 interface UsernameModalProps {

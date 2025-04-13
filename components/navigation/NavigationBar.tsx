@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { View, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
+import * as NavigationBarExpo from 'expo-navigation-bar';
 
 interface NavigationBarProps {
   onHomePress?: () => void;
@@ -61,6 +62,14 @@ export function NavigationBar({
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   
+  // Set Android navigation bar color on mount
+  React.useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBarExpo.setBackgroundColorAsync('#1F1F1F');
+      NavigationBarExpo.setButtonStyleAsync('light');
+    }
+  }, []);
+
   const isActive = (path: string) => {
     return pathname === path;
   };
@@ -132,6 +141,14 @@ export function NavigationBar({
       setActiveTab('profile');
     }
   }, [pathname]);
+  
+  // Hide the navigation bar for the order-card and order-confirmation routes on Android
+  if (Platform.OS === 'android' && (
+    pathname.includes('order-card') || 
+    pathname.includes('order-confirmation')
+  )) {
+    return null;
+  }
 
   return (
     <View style={[
@@ -142,8 +159,8 @@ export function NavigationBar({
         <SvgXml 
           xml={navbarBgSvg} 
           width={width} 
-          height={143 + insets.bottom} 
-          preserveAspectRatio="xMidYMax meet"
+          height={123 + insets.bottom} 
+          preserveAspectRatio={Platform.OS === 'android' ? 'none' : 'xMidYMax meet'}
         />
       </View>
       <View style={[styles.content, { paddingBottom: insets.bottom }]}>
@@ -256,6 +273,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: 143,
     zIndex: 100,
+
   },
   bgContainer: {
     position: 'absolute',
@@ -266,7 +284,7 @@ const styles = StyleSheet.create({
   content: {
     position: 'absolute',
     width: '100%',
-    height: '100%',
+    height: '92%',
     justifyContent: 'center',
     alignItems: 'center',
   },

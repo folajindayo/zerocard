@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { router, Stack } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Platform } from 'react-native';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OrderCardFlow from '../../../components/OrderCardFlow';
 import NameInput from '../../../components/NameInput';
 import DOBInput from '../../../components/DOBInput';
+import OrderConfirmation from '../../../components/OrderConfirmation';
 
 export default function OrderCardPage() {
   const [currentStep, setCurrentStep] = useState<'intro' | 'name' | 'dob'>('intro');
@@ -13,6 +14,11 @@ export default function OrderCardPage() {
     lastName: '',
     dateOfBirth: '',
   });
+  const params = useLocalSearchParams();
+  const hideTabBar = params.hideTabBar === 'true';
+  const showConfirmation = params.showConfirmation === 'true';
+  const identity = params.identity as string;
+  const isAndroid = Platform.OS === 'android';
 
   const handleClose = () => {
     router.back();
@@ -40,37 +46,49 @@ export default function OrderCardPage() {
     console.log('Form data:', formData);
   };
 
+  const handleBackToHome = () => {
+    router.replace('/(tab)/home');
+  };
+
   return (
     <>
       <Stack.Screen
         options={{
           headerShown: false,
           presentation: 'modal',
+          animation: isAndroid ? 'slide_from_bottom' : undefined,
+          gestureEnabled: true,
         }}
       />
       <SafeAreaView style={styles.container}>
-        {currentStep === 'intro' && (
-          <OrderCardFlow 
-            onClose={handleClose} 
-            onGetStarted={handleGetStarted}
-          />
-        )}
-        
-        {currentStep === 'name' && (
-          <NameInput 
-            onClose={handleClose}
-            onBack={handleBack}
-            onContinue={handleNameContinue}
-          />
-        )}
+        {showConfirmation ? (
+          <OrderConfirmation onBackHome={handleBackToHome} />
+        ) : (
+          <>
+            {currentStep === 'intro' && (
+              <OrderCardFlow 
+                onClose={handleClose} 
+                onGetStarted={handleGetStarted}
+              />
+            )}
+            
+            {currentStep === 'name' && (
+              <NameInput 
+                onClose={handleClose}
+                onBack={handleBack}
+                onContinue={handleNameContinue}
+              />
+            )}
 
-        {currentStep === 'dob' && (
-          <DOBInput
-            userName={formData.firstName}
-            onClose={handleClose}
-            onBack={handleBack}
-            onContinue={handleDOBContinue}
-          />
+            {currentStep === 'dob' && (
+              <DOBInput
+                userName={formData.firstName}
+                onClose={handleClose}
+                onBack={handleBack}
+                onContinue={handleDOBContinue}
+              />
+            )}
+          </>
         )}
       </SafeAreaView>
     </>
