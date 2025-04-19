@@ -37,12 +37,12 @@ export default function OrderCardPage() {
   };
 
   const handleNameContinue = (firstName: string, lastName: string) => {
-    setFormData(prev => ({ ...prev, firstName, lastName }));
+    setFormData((prev) => ({ ...prev, firstName, lastName }));
     setCurrentStep('dob');
   };
 
   const handleDOBContinue = (dob: string) => {
-    setFormData(prev => ({ ...prev, dateOfBirth: dob }));
+    setFormData((prev) => ({ ...prev, dateOfBirth: dob }));
     console.log('Form data:', formData);
   };
 
@@ -66,14 +66,11 @@ export default function OrderCardPage() {
         ) : (
           <>
             {currentStep === 'intro' && (
-              <OrderCardFlow 
-                onClose={handleClose} 
-                onGetStarted={handleGetStarted}
-              />
+              <OrderCardFlow onClose={handleClose} onGetStarted={handleGetStarted} />
             )}
-            
+
             {currentStep === 'name' && (
-              <NameInput 
+              <NameInput
                 onClose={handleClose}
                 onBack={handleBack}
                 onContinue={handleNameContinue}
@@ -100,4 +97,4 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F7F7F7',
   },
-}); 
+});

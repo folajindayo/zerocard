@@ -11,7 +11,7 @@ interface LoadingSpinnerProps {
 }
 
 /**
- * A reusable loading spinner component that can use either 
+ * A reusable loading spinner component that can use either
  * the standard ActivityIndicator or a Lottie animation.
  */
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
@@ -19,19 +19,14 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   color = '#40ff00',
   style,
   useLottie = false,
-  lottieSource = 'https://lottie.host/ba1c24cb-50de-47c1-8781-d609401ac8df/qn48q8KwW9.lottie'
+  lottieSource = 'https://lottie.host/ba1c24cb-50de-47c1-8781-d609401ac8df/qn48q8KwW9.lottie',
 }) => {
   const spinnerSize = typeof size === 'string' ? (size === 'large' ? 50 : 24) : size;
 
   return (
     <View style={[styles.container, style]}>
       {useLottie ? (
-        <LottieAnimation 
-          source={lottieSource} 
-          size={spinnerSize * 3} 
-          autoPlay 
-          loop 
-        />
+        <LottieAnimation source={lottieSource} size={spinnerSize * 3} autoPlay loop />
       ) : (
         <ActivityIndicator size={size} color={color} />
       )}
@@ -47,4 +42,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoadingSpinner; 
+export default LoadingSpinner;

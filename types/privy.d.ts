@@ -7,4 +7,4 @@ declare module '@privy-io/expo' {
     logout: () => Promise<void>;
     // Add other properties as needed
   }
-} 
+}

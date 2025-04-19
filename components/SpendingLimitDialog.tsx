@@ -27,7 +27,7 @@ const SpendingLimitDialog: React.FC<SpendingLimitDialogProps> = ({ onPress }) =>
         <View style={styles.iconContainer}>
           <SvgXml xml={setLimitIconSvg} width={36} height={36} />
         </View>
-        
+
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Your card, your rules</Text>
           <Text style={styles.description}>
@@ -79,4 +79,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SpendingLimitDialog; 
+export default SpendingLimitDialog;

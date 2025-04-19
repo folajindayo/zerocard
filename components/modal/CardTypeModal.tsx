@@ -1,14 +1,14 @@
 import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Modal, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
   Dimensions,
   Animated,
   Easing,
-  Platform
+  Platform,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { SquircleView } from 'react-native-figma-squircle';
@@ -55,11 +55,7 @@ interface CardTypeModalProps {
   onSelectCardType: (cardType: 'physical' | 'contactless') => void;
 }
 
-const CardTypeModal: React.FC<CardTypeModalProps> = ({
-  visible,
-  onClose,
-  onSelectCardType,
-}) => {
+const CardTypeModal: React.FC<CardTypeModalProps> = ({ visible, onClose, onSelectCardType }) => {
   // Animation values
   const opacity = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(100)).current;
@@ -73,14 +69,14 @@ const CardTypeModal: React.FC<CardTypeModalProps> = ({
           toValue: 1,
           duration: 300,
           useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
+          easing: Easing.out(Easing.ease),
         }),
         Animated.timing(translateY, {
           toValue: 0,
           duration: 300,
           useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
-        })
+          easing: Easing.out(Easing.ease),
+        }),
       ]).start();
     } else {
       Animated.parallel([
@@ -88,14 +84,14 @@ const CardTypeModal: React.FC<CardTypeModalProps> = ({
           toValue: 0,
           duration: 200,
           useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
+          easing: Easing.in(Easing.ease),
         }),
         Animated.timing(translateY, {
           toValue: 100,
           duration: 200,
           useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
-        })
+          easing: Easing.in(Easing.ease),
+        }),
       ]).start();
     }
   }, [visible, opacity, translateY]);
@@ -104,7 +100,7 @@ const CardTypeModal: React.FC<CardTypeModalProps> = ({
     onSelectCardType('physical');
     onClose();
     // Navigate to order-card page with correct path
-    router.push("/home/order-card");
+    router.push('/home/order-card');
   };
 
   // Return null on Android
@@ -113,63 +109,47 @@ const CardTypeModal: React.FC<CardTypeModalProps> = ({
   }
 
   return (
-    <Modal
-      transparent
-      visible={visible}
-      animationType="none"
-      onRequestClose={onClose}
-    >
+    <Modal transparent visible={visible} animationType="none" onRequestClose={onClose}>
       <BlurBackground visible={visible} intensity={40} tint="dark" />
-      
-      <TouchableOpacity 
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={onClose}
-      >
-        <Animated.View 
+
+      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
+        <Animated.View
           style={[
             styles.modalAnimatedContainer,
             {
               left: (width - 354) / 2, // Center horizontally
               opacity,
-              transform: [{ translateY }]
-            }
-          ]}
-        >
+              transform: [{ translateY }],
+            },
+          ]}>
           <SquircleView
             style={styles.modalContainer}
             squircleParams={{
               cornerSmoothing: 1,
               cornerRadius: 30,
               fillColor: '#F7F7F7',
-            }}
-          >
-            <TouchableOpacity 
-              activeOpacity={1} 
+            }}>
+            <TouchableOpacity
+              activeOpacity={1}
               onPress={(e) => e.stopPropagation()}
-              style={styles.modalTouchable}
-            >
+              style={styles.modalTouchable}>
               <View style={styles.headerContainer}>
                 <Text style={styles.title}>Select card type</Text>
                 <Text style={styles.subtitle}>Choose the type of card you'd like to own</Text>
               </View>
-              
+
               <View style={styles.cardOptionsContainer}>
                 {/* Physical Card Option */}
-                <TouchableOpacity 
-                  style={styles.cardOption} 
-                  onPress={handleSelectPhysicalCard}
-                >
+                <TouchableOpacity style={styles.cardOption} onPress={handleSelectPhysicalCard}>
                   <SquircleView
                     style={styles.cardOptionInner}
                     squircleParams={{
                       cornerSmoothing: 1,
                       cornerRadius: 20,
                       fillColor: '#FFFFFF',
-                    }}
-                  >
+                    }}>
                     <SvgXml xml={physicalCardSvg} width={36} height={36} />
-                    
+
                     <View style={styles.cardOptionContent}>
                       <Text style={styles.cardOptionTitle}>Physical card</Text>
                       <Text style={styles.cardOptionDescription}>
@@ -178,7 +158,7 @@ const CardTypeModal: React.FC<CardTypeModalProps> = ({
                     </View>
                   </SquircleView>
                 </TouchableOpacity>
-                
+
                 {/* Contactless Card Option (Disabled) */}
                 <TouchableOpacity style={styles.cardOptionDisabled} disabled>
                   <SquircleView
@@ -187,23 +167,22 @@ const CardTypeModal: React.FC<CardTypeModalProps> = ({
                       cornerSmoothing: 1,
                       cornerRadius: 20,
                       fillColor: '#E5E5E5',
-                    }}
-                  >
+                    }}>
                     <SvgXml xml={contactlessIconSvg} width={36} height={36} />
-                    
+
                     <View style={styles.cardOptionContent}>
                       <View style={styles.contactlessHeaderRow}>
                         <Text style={styles.cardOptionTitleDisabled}>Contactless</Text>
-                        
+
                         <View style={styles.comingSoonBadge}>
                           <Text style={styles.comingSoonText}>Coming soon</Text>
                         </View>
                       </View>
-                      
+
                       <Text style={styles.cardOptionDescriptionDisabled}>
                         Supports worldwide usage and transactions. Add your card to digital wallets
                       </Text>
-                      
+
                       <View style={styles.customizableBadge}>
                         <SvgXml xml={colorWheelIconSvg} width={16} height={16} />
                         <Text style={styles.customizableText}>Customizable</Text>
@@ -361,4 +340,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CardTypeModal; 
+export default CardTypeModal;

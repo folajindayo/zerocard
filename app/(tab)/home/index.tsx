@@ -8,7 +8,7 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import { Redirect, router } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { usePrivy } from '@privy-io/expo';
@@ -23,6 +23,7 @@ import CardControls from '../../../components/CardControls';
 import TransactionItem from '../../../components/TransactionItem';
 import CardTypeModal from '../../../components/modal/CardTypeModal';
 import SpendingLimitDialog from '../../../components/SpendingLimitDialog';
+import SpendingLimitToast from '../../../components/SpendingLimitToast';
 
 // Import mockdata
 import mockData from '../../../assets/mockdata.json';
@@ -37,42 +38,61 @@ type UserStage = 'new_user' | 'ordered_card' | 'activated_card' | 'has_transacti
 const generateRandomTransactions = () => {
   const transactionTypes = ['deposit', 'spend', 'withdraw'] as const;
   const merchantNames = [
-    'Starbucks', 'Uber', 'Amazon', 'Netflix', 'Walmart', 
-    'Target', 'Apple Store', 'Spotify', 'DoorDash', 'Nike', 
-    'Trader Joe\'s', 'Whole Foods', 'Best Buy', 'GameStop'
+    'Starbucks',
+    'Uber',
+    'Amazon',
+    'Netflix',
+    'Walmart',
+    'Target',
+    'Apple Store',
+    'Spotify',
+    'DoorDash',
+    'Nike',
+    "Trader Joe's",
+    'Whole Foods',
+    'Best Buy',
+    'GameStop',
   ];
   const dates = ['Today', 'Yesterday', 'Jun 28', 'Jun 27', 'Jun 25', 'Jun 23', 'Jun 21'];
   const times = ['9:30am', '10:45am', '1:15pm', '3:30pm', '6:45pm', '8:20pm'];
-  const categories = ['Food', 'Transportation', 'Shopping', 'Entertainment', 'Groceries', 'Technology'];
-  
+  const categories = [
+    'Food',
+    'Transportation',
+    'Shopping',
+    'Entertainment',
+    'Groceries',
+    'Technology',
+  ];
+
   // Random number between min and max
   const randomInt = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
-  
+
   // Generate 5-8 random transactions
   const count = randomInt(5, 8);
   const transactions = [];
-  
+
   for (let i = 0; i < count; i++) {
     const type = transactionTypes[randomInt(0, transactionTypes.length - 1)];
-    
+
     const transaction = {
       id: `${i + 1}`,
       type,
       name: merchantNames[randomInt(0, merchantNames.length - 1)],
       date: dates[randomInt(0, dates.length - 1)],
       time: times[randomInt(0, times.length - 1)],
-      amount: type === 'deposit' ? 
-        parseFloat((randomInt(50, 3000) + Math.random()).toFixed(2)) : 
-        parseFloat((randomInt(5, 500) + Math.random()).toFixed(2)),
+      amount:
+        type === 'deposit'
+          ? parseFloat((randomInt(50, 3000) + Math.random()).toFixed(2))
+          : parseFloat((randomInt(5, 500) + Math.random()).toFixed(2)),
       currency: 'USDC',
-      category: categories[randomInt(0, categories.length - 1)]
+      category: categories[randomInt(0, categories.length - 1)],
     };
-    
+
     transactions.push(transaction);
   }
-  
+
   return transactions;
 };
 
@@ -82,22 +102,33 @@ const mockTransactions = generateRandomTransactions();
 export default function HomeScreen() {
   const { user, logout } = usePrivy() as any;
   const insets = useSafeAreaInsets();
-  
+  const { showLimitToast } = useLocalSearchParams<{ showLimitToast?: string }>();
+
   // State for user's stage in the onboarding process
   const [userStage, setUserStage] = useState<UserStage>('new_user');
-  
+
   // State for username modal
   const [usernameModalVisible, setUsernameModalVisible] = useState(false);
   const [username, setUsername] = useState<string>('');
-  
+
   // State for Android username modal
   const [androidUsernameModalVisible, setAndroidUsernameModalVisible] = useState(false);
-  
+
   // State for card type modal
   const [cardTypeModalVisible, setCardTypeModalVisible] = useState(false);
 
   // State for transactions
   const [transactions, setTransactions] = useState(mockTransactions);
+
+  // State for toast
+  const [toastVisible, setToastVisible] = useState(false);
+
+  // Show toast notification if the showLimitToast param is present
+  useEffect(() => {
+    if (showLimitToast === 'true') {
+      setToastVisible(true);
+    }
+  }, [showLimitToast]);
 
   // Load saved state from AsyncStorage
   useEffect(() => {
@@ -107,22 +138,21 @@ export default function HomeScreen() {
         const userVerified = await AsyncStorage.getItem('user_verified');
         const cardOrdered = await AsyncStorage.getItem('card_ordered');
         const savedUsername = await AsyncStorage.getItem('username');
-        
+
         // If we have a saved username, use it
         if (savedUsername) {
           setUsername(savedUsername);
         }
-        
+
         // If card was ordered, update the stage
         if (cardOrdered === 'true') {
           setUserStage('ordered_card');
         }
-        
       } catch (error) {
         console.error('Error loading saved state:', error);
       }
     };
-    
+
     loadSavedState();
   }, []);
 
@@ -143,17 +173,17 @@ export default function HomeScreen() {
       const timer = setTimeout(() => {
         setUsernameModalVisible(true);
       }, 1000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [userStage, username]);
-  
+
   // Handle username setup
   const handleSetUsername = async (newUsername: string) => {
     setUsername(newUsername);
     setUsernameModalVisible(false);
     setAndroidUsernameModalVisible(false);
-    
+
     // Save username to AsyncStorage
     try {
       await AsyncStorage.setItem('username', newUsername);
@@ -181,7 +211,12 @@ export default function HomeScreen() {
   const handleLogout = async () => {
     try {
       // Clear any saved state on logout
-      await AsyncStorage.multiRemove(['username', 'user_verified', 'card_ordered', 'identity_type']);
+      await AsyncStorage.multiRemove([
+        'username',
+        'user_verified',
+        'card_ordered',
+        'identity_type',
+      ]);
       await logout();
       // No need for navigation here - the Redirect will handle it
     } catch (error) {
@@ -199,7 +234,7 @@ export default function HomeScreen() {
     // In a real app, this would call an API to order the selected card type
     console.log(`${cardType} card ordered`);
     setUserStage('ordered_card');
-    
+
     // Save ordered state
     try {
       await AsyncStorage.setItem('card_ordered', 'true');
@@ -263,6 +298,9 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Toast notification */}
+      <SpendingLimitToast visible={toastVisible} onDismiss={() => setToastVisible(false)} />
+
       {/* Username Modal - only on iOS */}
       {Platform.OS === 'ios' && (
         <UsernameModal
@@ -272,7 +310,7 @@ export default function HomeScreen() {
           initialUsername={username}
         />
       )}
-      
+
       {/* Android Username Modal */}
       {Platform.OS === 'android' && (
         <AndroidUsernameModal
@@ -282,56 +320,61 @@ export default function HomeScreen() {
           initialUsername={username}
         />
       )}
-      
+
       {/* Card Type Modal */}
       <CardTypeModal
         visible={cardTypeModalVisible}
         onClose={() => setCardTypeModalVisible(false)}
         onSelectCardType={handleSelectCardType}
       />
-      
+
       {/* Fixed Header */}
       <View style={[styles.fixedHeader, { paddingTop: insets.top > 0 ? 8 : 4 }]}>
-        <GreetingHeader 
+        <GreetingHeader
           username={displayName}
           profileImage={profileIcon}
           onProfilePress={handleProfilePress}
         />
       </View>
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollContent}
         contentContainerStyle={styles.scrollContentContainer}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         {/* Balance Section - show 0 for new users */}
         <UsdcBalance amount={userStage === 'new_user' ? 0 : mockData.user.balance} />
 
         {/* Card Module */}
         <View style={styles.cardModuleContainer}>
-          <CardModule 
+          <CardModule
             cardNumber={getCardNumber()}
             cardHolderName={displayName || 'Your Name Here'}
             expiryDate={getExpiryDate()}
             walletAddress={getWalletAddress()}
           />
         </View>
-        
+
         {/* Card Status - Only show for new users and users who ordered a card */}
         {(userStage === 'new_user' || userStage === 'ordered_card') && (
           <View style={styles.cardStatusContainer}>
-            <CardStatusComponent 
+            <CardStatusComponent
               status={userStage === 'new_user' ? 'not_found' : 'ordered'}
-              onPrimaryButtonPress={userStage === 'new_user' ? handleOrderCard : handleActivateCard}
-              onSecondaryButtonPress={userStage === 'new_user' ? handleLoadWallet : handleCheckStatus}
+              onPrimaryButtonPress={
+                userStage === 'new_user'
+                  ? handleOrderCard
+                  : () => router.push('/(app)/card-activation/qr-scanner')
+              }
+              onSecondaryButtonPress={
+                userStage === 'new_user' ? handleLoadWallet : handleCheckStatus
+              }
             />
           </View>
         )}
-        
+
         {/* Card Controls - Only show for users with activated cards */}
         {(userStage === 'activated_card' || userStage === 'has_transactions') && (
           <View style={styles.cardControlsContainer}>
-            <CardControls 
+            <CardControls
               onLoadCard={() => {
                 console.log('Load card pressed');
               }}
@@ -344,7 +387,7 @@ export default function HomeScreen() {
             />
           </View>
         )}
-        
+
         {/* Spending Limit Dialog - Only show for users with activated cards */}
         {(userStage === 'activated_card' || userStage === 'has_transactions') && (
           <View style={styles.spendingLimitContainer}>
@@ -359,36 +402,28 @@ export default function HomeScreen() {
               <Text style={styles.sectionTitle}>Recent Transactions</Text>
               <Text style={styles.sectionAction}>View All</Text>
             </View>
-            
+
             {/* Show transactions or empty state based on user stage */}
-            {userStage === 'has_transactions' ? (
-              transactions.map(transaction => (
-                <TransactionItem
-                  key={transaction.id}
-                  id={transaction.id}
-                  type={transaction.type}
-                  name={transaction.name}
-                  amount={transaction.amount}
-                  date={transaction.date}
-                  time={transaction.time}
-                  currency={transaction.currency}
-                  category={transaction.category}
-                />
-              ))
-            ) : (
-              renderEmptyTransactions()
-            )}
-            
+            {userStage === 'has_transactions'
+              ? transactions.map((transaction) => (
+                  <TransactionItem
+                    key={transaction.id}
+                    id={transaction.id}
+                    type={transaction.type}
+                    name={transaction.name}
+                    amount={transaction.amount}
+                    date={transaction.date}
+                    time={transaction.time}
+                    currency={transaction.currency}
+                    category={transaction.category}
+                  />
+                ))
+              : renderEmptyTransactions()}
+
             {/* Button to toggle transaction state */}
-            <TouchableOpacity 
-              style={styles.toggleButton} 
-              onPress={toggleTransactionState}
-            >
+            <TouchableOpacity style={styles.toggleButton} onPress={toggleTransactionState}>
               <Text style={styles.toggleButtonText}>
-                {userStage === 'activated_card' 
-                  ? 'Simulate Transactions' 
-                  : 'Clear Transactions'
-                }
+                {userStage === 'activated_card' ? 'Simulate Transactions' : 'Clear Transactions'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -465,12 +500,12 @@ const styles = StyleSheet.create({
     marginTop: Platform.select({
       android: 32,
       ios: 16,
-      default: 8
+      default: 8,
     }),
     marginBottom: Platform.select({
       android: 12,
       ios: 16,
-      default: 8
+      default: 8,
     }),
     alignItems: 'center',
   },
@@ -493,4 +528,4 @@ const styles = StyleSheet.create({
     marginTop: 0, // 16px gap from CardControls
     marginBottom: 16,
   },
-}); 
+});

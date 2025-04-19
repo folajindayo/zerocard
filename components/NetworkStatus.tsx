@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions, AppState, AppStateStatus } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  AppState,
+  AppStateStatus,
+} from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import * as Network from 'expo-network';
 import * as Haptics from 'expo-haptics';
@@ -38,48 +46,48 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
   // Animation values
   const translateY = useRef(new Animated.Value(-100)).current;
   const opacity = useRef(new Animated.Value(0)).current;
-  
+
   // Timer for auto-dismissing poor connectivity toast
   const dismissTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Window dimensions for positioning
   const { width } = Dimensions.get('window');
-  
+
   // Track if active ping is in progress
   const isPingingRef = useRef(false);
-  
+
   // Last check time to prevent excessive checks
   const lastCheckTimeRef = useRef(0);
-  
+
   // Track app state for optimized checking
   const appStateRef = useRef(AppState.currentState);
-  
+
   // Lighter ping function that only checks a single local server
   // Only used when necessary
   const performLightPing = async (): Promise<boolean> => {
     // If already pinging, don't start another
     if (isPingingRef.current) return true;
-    
+
     // Only check once every 30 seconds max to preserve battery
     const now = Date.now();
     if (now - lastCheckTimeRef.current < 30000) {
       return true; // Assume connection is still good
     }
-    
+
     try {
       isPingingRef.current = true;
-      
+
       // Use a single reliable server, preferably in Nigeria or nearby
-      const response = await fetch('https://www.google.com.ng', { 
+      const response = await fetch('https://www.google.com.ng', {
         method: 'HEAD',
         cache: 'no-cache',
         // Use a longer timeout (3s) for Nigerian network conditions
-        signal: AbortSignal.timeout(3000) 
+        signal: AbortSignal.timeout(3000),
       });
-      
+
       isPingingRef.current = false;
       lastCheckTimeRef.current = now;
-      
+
       return response.ok;
     } catch (error) {
       isPingingRef.current = false;
@@ -87,7 +95,7 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
       return false;
     }
   };
-  
+
   // Optimized network check that uses multiple indicators
   // but minimizes resource usage
   const checkNetworkStatus = async (forceCheck: boolean = false) => {
@@ -96,22 +104,22 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
       if (appStateRef.current !== 'active' && !forceCheck) {
         return;
       }
-      
+
       // Get basic network info (uses cached values when available)
       const networkState = await Network.getNetworkStateAsync();
-      
+
       // No connection case is straightforward
       if (!networkState.isConnected || !networkState.isInternetReachable) {
         setNetworkStatus('NONE');
         return;
       }
-      
+
       // Detect poor connectivity using multiple signals
       let isPoorConnection = false;
-      
+
       // 1. Check connection type - basic indicator
       const isCellular = networkState.type === Network.NetworkStateType.CELLULAR;
-      
+
       // 2. Check if we've had failed network requests recently
       const now = Date.now();
       if (now - failedRequests.lastCheck > failedRequests.resetTime) {
@@ -119,23 +127,23 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
         failedRequests.count = 0;
         failedRequests.lastCheck = now;
       }
-      
+
       // If we've had multiple failed requests recently, that's a sign of poor connection
       if (failedRequests.count >= 2) {
         isPoorConnection = true;
-      } 
+      }
       // If on cellular, lower our expectations for Nigerian networks
       // Only ping when on cellular and no recent failures (saves resources)
       else if (isCellular && !(await performLightPing())) {
         isPoorConnection = true;
       }
-      
+
       setNetworkStatus(isPoorConnection ? 'POOR' : null);
     } catch (error) {
       console.error('Error checking network status:', error);
     }
   };
-  
+
   // Function to animate the toast in
   const animateIn = () => {
     Animated.parallel([
@@ -151,7 +159,7 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
       }),
     ]).start();
   };
-  
+
   // Function to animate the toast out
   const animateOut = (callback?: () => void) => {
     Animated.parallel([
@@ -169,7 +177,7 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
       if (callback) callback();
     });
   };
-  
+
   // Global listener for network requests
   // This is the most efficient way to detect problems
   useEffect(() => {
@@ -183,52 +191,47 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
         // Record the failure for our passive detection
         failedRequests.count++;
         failedRequests.lastCheck = Date.now();
-        
+
         // Check network after a failure
         checkNetworkStatus(true);
-        
+
         throw error;
       }
     };
-    
+
     // Restore original fetch on unmount
     return () => {
       global.fetch = originalFetch;
     };
   }, []);
-  
+
   // Handle app state changes to conserve battery
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       // Only check network when app comes to foreground
-      if (
-        appStateRef.current.match(/inactive|background/) && 
-        nextAppState === 'active'
-      ) {
+      if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
         checkNetworkStatus(true);
       }
-      
+
       appStateRef.current = nextAppState;
     };
-    
+
     const subscription = AppState.addEventListener('change', handleAppStateChange);
-    
+
     return () => {
       subscription.remove();
     };
   }, []);
-  
+
   // Set up timer for auto-dismissing poor connectivity toast
   useEffect(() => {
     if (networkStatus === 'POOR' && !dismissTimerRef.current) {
       // Show the toast
       animateIn();
-      
+
       // Trigger warning haptic feedback
-      Haptics.notificationAsync(
-        Haptics.NotificationFeedbackType.Warning
-      );
-      
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+
       // Set a timer to dismiss after 3.5 seconds
       dismissTimerRef.current = setTimeout(() => {
         animateOut(() => {
@@ -239,12 +242,10 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
     } else if (networkStatus === 'NONE') {
       // Show the no connectivity toast
       animateIn();
-      
+
       // Trigger error haptic feedback
-      Haptics.notificationAsync(
-        Haptics.NotificationFeedbackType.Error
-      );
-      
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
       // Clear any existing dismiss timer
       if (dismissTimerRef.current) {
         clearTimeout(dismissTimerRef.current);
@@ -253,14 +254,14 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
     } else if (networkStatus === null) {
       // Hide the toast
       animateOut();
-      
+
       // Clear any existing dismiss timer
       if (dismissTimerRef.current) {
         clearTimeout(dismissTimerRef.current);
         dismissTimerRef.current = null;
       }
     }
-    
+
     // Clean up timer on unmount
     return () => {
       if (dismissTimerRef.current) {
@@ -268,22 +269,22 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
       }
     };
   }, [networkStatus]);
-  
+
   // Check network initially and set up very infrequent checks
   useEffect(() => {
     // Initial check
     checkNetworkStatus(true);
-    
+
     // Set up less frequent checks (once per minute) to minimize resource usage
     const intervalId = setInterval(() => checkNetworkStatus(), 60000);
-    
+
     // Clean up interval on unmount
     return () => clearInterval(intervalId);
   }, []);
-  
+
   // Don't render anything if network status is null
   if (networkStatus === null) return null;
-  
+
   // Content based on network status
   const isPoorConnectivity = networkStatus === 'POOR';
   const title = isPoorConnectivity ? 'Poor connectivity' : 'No connectivity';
@@ -291,25 +292,26 @@ const NetworkStatus: React.FC<NetworkStatusProps> = ({ onClose }) => {
     ? 'You are experiencing a weak internet\nconnection.'
     : 'You are currently not connected to the internet.\nPlease check your connection.';
   const iconSvg = isPoorConnectivity ? networkPoorSvg : networkErrorSvg;
-  
+
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.container,
         {
           transform: [{ translateY }],
           opacity,
           width: width - 40, // 20px margin on each side
-          top: 60 // Position from top - increased from 40 to 60
+          top: 60, // Position from top - increased from 40 to 60
         },
-      ]}
-    >
+      ]}>
       <View style={styles.content}>
         <SvgXml xml={iconSvg} width={24} height={24} />
-        
+
         <View style={styles.textContainer}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.message} numberOfLines={2}>{message}</Text>
+          <Text style={styles.message} numberOfLines={2}>
+            {message}
+          </Text>
         </View>
       </View>
     </Animated.View>
@@ -356,8 +358,8 @@ const styles = StyleSheet.create({
     lineHeight: 16.8, // 120% of font size
     color: '#767676',
     flexWrap: 'wrap',
-    width: '100%'
+    width: '100%',
   },
 });
 
-export default NetworkStatus; 
+export default NetworkStatus;

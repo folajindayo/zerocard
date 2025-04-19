@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  StyleSheet,
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { useFonts } from 'expo-font';
@@ -92,20 +92,20 @@ const NIGERIAN_STATES = [
   'Sokoto',
   'Taraba',
   'Yobe',
-  'Zamfara'
+  'Zamfara',
 ];
 
-const ShippingAddress: React.FC<ShippingAddressProps> = ({ 
-  onClose, 
-  onBack, 
-  onContinue, 
+const ShippingAddress: React.FC<ShippingAddressProps> = ({
+  onClose,
+  onBack,
+  onContinue,
   userName = 'there',
   userInfo = {
     firstName: 'Temidayo',
     lastName: 'Folajin',
     dob: '2005-11-16',
-    phoneNumber: '09012345678'
-  }
+    phoneNumber: '09012345678',
+  },
 }) => {
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
@@ -113,7 +113,7 @@ const ShippingAddress: React.FC<ShippingAddressProps> = ({
   const [postalCode, setPostalCode] = useState('');
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [showSubmissionSummary, setShowSubmissionSummary] = useState(false);
-  
+
   const streetRef = useRef<TextInput>(null);
   const cityRef = useRef<TextInput>(null);
   const postalCodeRef = useRef<TextInput>(null);
@@ -134,25 +134,25 @@ const ShippingAddress: React.FC<ShippingAddressProps> = ({
         console.error('Error loading draft:', error);
       }
     };
-    
+
     loadDraft();
   }, []);
 
   const handleContinue = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    
+
     // Show Submission Summary
     setShowSubmissionSummary(true);
-    
+
     // Call the onContinue prop if provided
     if (onContinue) {
       const addressData: AddressData = {
         street,
         city,
         state,
-        postalCode
+        postalCode,
       };
-      
+
       onContinue(addressData);
     }
   };
@@ -195,9 +195,9 @@ const ShippingAddress: React.FC<ShippingAddressProps> = ({
       street,
       city,
       state,
-      postalCode
+      postalCode,
     };
-    
+
     return (
       <SubmissionSummary
         onClose={onClose}
@@ -214,46 +214,35 @@ const ShippingAddress: React.FC<ShippingAddressProps> = ({
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView 
+      style={styles.container}>
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
         {onBack && (
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={onBack}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
             <SvgXml xml={backArrowIconSvg} width={24} height={24} />
           </TouchableOpacity>
         )}
-        
+
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <Text style={styles.titleText}>
-              Where would you like your{'\n'}card delivered?
-            </Text>
+            <Text style={styles.titleText}>Where would you like your{'\n'}card delivered?</Text>
             <Text style={styles.descriptionText}>
               Tell us where you live and get your card, flash speed
             </Text>
           </View>
-          
+
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <SvgXml xml={closeIconSvg} width={24} height={24} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.addressFieldsContainer}>
           {/* Street */}
           <View style={styles.inputContainer}>
             <TextInput
               ref={streetRef}
-              style={[
-                styles.textInput,
-                street ? styles.filledInput : null
-              ]}
+              style={[styles.textInput, street ? styles.filledInput : null]}
               placeholder="Street"
               placeholderTextColor="#A2A2A2"
               value={street}
@@ -263,17 +252,14 @@ const ShippingAddress: React.FC<ShippingAddressProps> = ({
               returnKeyType="next"
             />
           </View>
-          
+
           {/* City and State row */}
           <View style={styles.rowContainer}>
             {/* City */}
             <View style={styles.halfInputContainer}>
               <TextInput
                 ref={cityRef}
-                style={[
-                  styles.textInput,
-                  city ? styles.filledInput : null
-                ]}
+                style={[styles.textInput, city ? styles.filledInput : null]}
                 placeholder="City"
                 placeholderTextColor="#A2A2A2"
                 value={city}
@@ -282,41 +268,31 @@ const ShippingAddress: React.FC<ShippingAddressProps> = ({
                 onSubmitEditing={handleStatePress}
               />
             </View>
-            
+
             {/* State */}
             <View style={styles.halfInputContainer}>
-              <TouchableOpacity 
-                style={[
-                  styles.textInput,
-                  styles.stateInput
-                ]}
-                onPress={handleStatePress}
-              >
-                <Text style={[
-                  styles.stateText,
-                  state ? styles.filledStateText : null
-                ]}>
+              <TouchableOpacity
+                style={[styles.textInput, styles.stateInput]}
+                onPress={handleStatePress}>
+                <Text style={[styles.stateText, state ? styles.filledStateText : null]}>
                   {state || 'State'}
                 </Text>
                 <SvgXml xml={arrowDownIconSvg} width={16} height={16} />
               </TouchableOpacity>
-              
+
               {showStateDropdown && (
                 <View style={styles.stateDropdown}>
-                  <ScrollView 
-                    style={styles.stateScrollView}
-                    nestedScrollEnabled
-                  >
+                  <ScrollView style={styles.stateScrollView} nestedScrollEnabled>
                     {NIGERIAN_STATES.map((stateName) => (
                       <TouchableOpacity
                         key={stateName}
                         style={styles.stateOption}
-                        onPress={() => selectState(stateName)}
-                      >
-                        <Text style={[
-                          styles.stateOptionText,
-                          stateName === state ? styles.selectedStateText : null
-                        ]}>
+                        onPress={() => selectState(stateName)}>
+                        <Text
+                          style={[
+                            styles.stateOptionText,
+                            stateName === state ? styles.selectedStateText : null,
+                          ]}>
                           {stateName}
                         </Text>
                       </TouchableOpacity>
@@ -326,15 +302,12 @@ const ShippingAddress: React.FC<ShippingAddressProps> = ({
               )}
             </View>
           </View>
-          
+
           {/* Postal Code */}
           <View style={styles.inputContainer}>
             <TextInput
               ref={postalCodeRef}
-              style={[
-                styles.textInput,
-                postalCode ? styles.filledInput : null
-              ]}
+              style={[styles.textInput, postalCode ? styles.filledInput : null]}
               placeholder="Postal code"
               placeholderTextColor="#A2A2A2"
               value={postalCode}
@@ -344,18 +317,12 @@ const ShippingAddress: React.FC<ShippingAddressProps> = ({
             />
           </View>
         </View>
-        
-        <TouchableOpacity 
-          style={styles.continueButton}
-          onPress={handleContinue}
-        >
+
+        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.saveDraftButton}
-          onPress={saveDraft}
-        >
+
+        <TouchableOpacity style={styles.saveDraftButton} onPress={saveDraft}>
           <Text style={styles.saveDraftButtonText}>Save draft</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -547,4 +514,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ShippingAddress; 
+export default ShippingAddress;

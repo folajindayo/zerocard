@@ -80,10 +80,7 @@ export default function SplashScreen() {
             </Text>
 
             <View style={styles.actionContainer}>
-              <TouchableOpacity
-                style={styles.getStartedButton}
-                onPress={handleStartSpending}
-              >
+              <TouchableOpacity style={styles.getStartedButton} onPress={handleStartSpending}>
                 <Text style={styles.buttonText}>Start spending</Text>
                 <View style={styles.arrowContainer}>
                   <Text style={styles.arrow}>→</Text>

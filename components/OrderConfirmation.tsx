@@ -8,23 +8,23 @@ interface OrderConfirmationProps {
   onBackHome: () => void;
 }
 
-const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ 
-  onBackHome = () => router.back()
+const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
+  onBackHome = () => router.back(),
 }) => {
   // Animation values
   const translateY = useSharedValue(-200);
   const opacity = useSharedValue(0);
-  
+
   // Set up animation when component mounts
   useEffect(() => {
     // Animate the card image with spring and fade in
-    translateY.value = withSpring(0, { 
-      damping: 15, 
-      stiffness: 100 
+    translateY.value = withSpring(0, {
+      damping: 15,
+      stiffness: 100,
     });
     opacity.value = withSpring(1);
   }, []);
-  
+
   // Animated style for the card image
   const animatedImageStyle = useAnimatedStyle(() => {
     return {
@@ -32,35 +32,30 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
       opacity: opacity.value,
     };
   });
-  
+
   return (
     <View style={styles.container}>
       {/* Animated card image */}
       <Animated.View style={animatedImageStyle}>
-        <Image 
-          source={require('../assets/card-image.png')} 
+        <Image
+          source={require('../assets/card-image.png')}
           style={styles.cardImage}
           resizeMode="contain"
         />
       </Animated.View>
-      
+
       {/* Text container */}
       <View style={styles.textContainer}>
-        <Text style={styles.titleText}>
-          Your card has been ordered!
-        </Text>
+        <Text style={styles.titleText}>Your card has been ordered!</Text>
         <Text style={styles.descriptionText}>
-          Time for financial freedom, your card should take <Text style={styles.blackText}>5-7 working days</Text> for delivery
+          Time for financial freedom, your card should take{' '}
+          <Text style={styles.blackText}>5-7 working days</Text> for delivery
         </Text>
       </View>
-      
+
       {/* Back home button */}
       <View style={styles.buttonContainer}>
-        <Button 
-          title="Back home" 
-          variant="primary"
-          onPress={onBackHome}
-        />
+        <Button title="Back home" variant="primary" onPress={onBackHome} />
       </View>
     </View>
   );
@@ -116,4 +111,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OrderConfirmation; 
+export default OrderConfirmation;

@@ -21,13 +21,7 @@ const BlurBackground: React.FC<BlurBackgroundProps> = ({
 }) => {
   if (!visible) return null;
 
-  return (
-    <BlurView
-      intensity={intensity}
-      tint={tint}
-      style={[StyleSheet.absoluteFill, style]}
-    />
-  );
+  return <BlurView intensity={intensity} tint={tint} style={[StyleSheet.absoluteFill, style]} />;
 };
 
-export default BlurBackground; 
+export default BlurBackground;

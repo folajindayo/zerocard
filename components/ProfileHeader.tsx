@@ -26,40 +26,40 @@ const copyIconSvg = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"
 const ProfileHeader: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const { username, walletAddress } = mockData.user;
-  
+
   // Format wallet address to show first and last characters
   const formattedWalletAddress = walletAddress || '0x0000..0000';
-  
+
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (status !== 'granted') {
       Alert.alert('Permission required', 'Please grant permission to access your photos');
       return;
     }
-    
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
     });
-    
+
     if (!result.canceled) {
       setProfileImage(result.assets[0].uri);
     }
   };
-  
+
   const copyToClipboard = async () => {
     await Clipboard.setStringAsync(walletAddress);
     Alert.alert('Copied', 'Wallet address copied to clipboard');
   };
-  
+
   // Get initials for placeholder
   const getInitials = () => {
     return username ? username.charAt(0).toUpperCase() : 'U';
   };
-  
+
   return (
     <View style={styles.container}>
       {/* Profile image with edit button */}
@@ -77,10 +77,10 @@ const ProfileHeader: React.FC = () => {
           </View>
         </TouchableOpacity>
       </View>
-      
+
       {/* Username */}
       <Text style={styles.username}>{username}</Text>
-      
+
       {/* Wallet address with copy button */}
       <TouchableOpacity style={styles.walletContainer} onPress={copyToClipboard}>
         <Text style={styles.walletAddress}>{formattedWalletAddress}</Text>
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 4, 
+    paddingVertical: 4,
     paddingHorizontal: 8,
     gap: 4,
     backgroundColor: '#ECECEC',
@@ -178,4 +178,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileHeader; 
+export default ProfileHeader;

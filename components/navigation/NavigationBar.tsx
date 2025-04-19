@@ -61,7 +61,7 @@ export function NavigationBar({
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  
+
   // Set Android navigation bar color on mount
   React.useEffect(() => {
     if (Platform.OS === 'android') {
@@ -78,7 +78,7 @@ export function NavigationBar({
     try {
       // Use selectionAsync for a soft, subtle feedback - best for UI interactions
       await Haptics.selectionAsync();
-      
+
       // Fallback to light impact if needed
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch (error) {
@@ -141,25 +141,22 @@ export function NavigationBar({
       setActiveTab('profile');
     }
   }, [pathname]);
-  
+
   // Hide the navigation bar for the order-card and order-confirmation routes on Android
-  if (Platform.OS === 'android' && (
-    pathname.includes('order-card') || 
-    pathname.includes('order-confirmation')
-  )) {
+  if (
+    Platform.OS === 'android' &&
+    (pathname.includes('order-card') || pathname.includes('order-confirmation'))
+  ) {
     return null;
   }
 
   return (
-    <View style={[
-      styles.container,
-      { width: width }
-    ]}>
+    <View style={[styles.container, { width: width }]}>
       <View style={styles.bgContainer}>
-        <SvgXml 
-          xml={navbarBgSvg} 
-          width={width} 
-          height={123 + insets.bottom} 
+        <SvgXml
+          xml={navbarBgSvg}
+          width={width}
+          height={123 + insets.bottom}
           preserveAspectRatio={Platform.OS === 'android' ? 'none' : 'xMidYMax meet'}
         />
       </View>
@@ -172,8 +169,7 @@ export function NavigationBar({
               await handleHomePress();
             }}
             activeOpacity={0.7}
-            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-          >
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
             <HomeIcon active={activeTab === 'home'} />
           </TouchableOpacity>
 
@@ -184,8 +180,7 @@ export function NavigationBar({
               await handleCardPress();
             }}
             activeOpacity={0.7}
-            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-          >
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
             <CardIcon active={activeTab === 'card'} />
           </TouchableOpacity>
 
@@ -196,8 +191,7 @@ export function NavigationBar({
               await handleAddPress();
             }}
             activeOpacity={0.7}
-            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-          >
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
             <AddCircleIcon active={activeTab === 'add'} />
           </TouchableOpacity>
 
@@ -208,8 +202,7 @@ export function NavigationBar({
               await handleProfilePress();
             }}
             activeOpacity={0.7}
-            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-          >
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
             <ProfileIcon active={activeTab === 'profile'} />
           </TouchableOpacity>
         </View>
@@ -259,10 +252,7 @@ function ProfileIcon({ active = false }: { active?: boolean }) {
   return (
     <View style={[styles.iconWrapper, styles.profileIcon]}>
       {/* This would typically be a user's profile image */}
-      <View style={[
-        styles.profileCircle,
-        active && styles.profileCircleActive
-      ]} />
+      <View style={[styles.profileCircle, active && styles.profileCircleActive]} />
     </View>
   );
 }
@@ -273,7 +263,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: 143,
     zIndex: 100,
-
   },
   bgContainer: {
     position: 'absolute',
@@ -323,4 +312,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NavigationBar; 
+export default NavigationBar;

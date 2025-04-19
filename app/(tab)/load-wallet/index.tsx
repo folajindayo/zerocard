@@ -1,11 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  PixelRatio, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  PixelRatio,
   Image,
   Modal,
   Dimensions,
@@ -14,7 +14,7 @@ import {
   LogBox,
   AppState,
   AppStateStatus,
-  Alert
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AddMoney from '../../../components/AddMoney';
@@ -81,21 +81,21 @@ export default function LoadWalletScreen() {
 
   const captureScreenshot = useCallback(async () => {
     if (isCapturing) return;
-    
+
     setIsCapturing(true);
-    
+
     try {
       // Temporarily make ViewShot visible for capture
       setViewShotOpacity(1);
-      
+
       // Wait for the opacity change to take effect
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
       if (viewShotRef.current) {
         try {
           const cssWidth = 402;
           const cssHeight = 599;
-          
+
           const captureOptions = {
             format: 'jpg' as 'jpg',
             quality: 0.9,
@@ -103,7 +103,7 @@ export default function LoadWalletScreen() {
             width: cssWidth * pixelRatio,
             height: cssHeight * pixelRatio,
           };
-          
+
           const uri = await captureRef(viewShotRef, captureOptions);
           setCapturedImage(uri);
           setShowModal(true);
@@ -123,27 +123,28 @@ export default function LoadWalletScreen() {
       if (capturedImage) {
         // Create a temporary file path
         const fileUri = FileSystem.documentDirectory + 'zerocard-wallet.jpg';
-        
+
         // Extract base64 data from data URI
         const base64Data = capturedImage.split(',')[1];
-        
+
         if (!base64Data) {
           console.error('Failed to extract base64 data from image URI');
           return;
         }
-        
+
         // Write to filesystem
         await FileSystem.writeAsStringAsync(fileUri, base64Data, {
           encoding: FileSystem.EncodingType.Base64,
         });
-        
+
         // Share the image with updated message about Zerocard's functionality
         const result = await Share.share({
           url: Platform.OS === 'ios' ? fileUri : `file://${fileUri}`,
           title: '💳 ZeroCard - Spend Crypto Like Cash!',
-          message: '💰 My wallet is loaded and ready! With ZeroCard I can spend crypto like cash with my physical card. The future of payments is here!',
+          message:
+            '💰 My wallet is loaded and ready! With ZeroCard I can spend crypto like cash with my physical card. The future of payments is here!',
         });
-        
+
         if (result.action === Share.sharedAction) {
           setShowModal(false);
         }
@@ -157,33 +158,33 @@ export default function LoadWalletScreen() {
     try {
       // Request permissions only when saving
       const { status } = await MediaLibrary.requestPermissionsAsync();
-      
+
       if (status !== 'granted') {
         Alert.alert(
           'Permission Required',
           'ZeroCard needs permission to save images to your gallery',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Settings', onPress: () => {} }
+            { text: 'Settings', onPress: () => {} },
           ]
         );
         return;
       }
-      
+
       if (!capturedImage) return;
-      
+
       // Create a file from the data URI
       const fileUri = FileSystem.documentDirectory + 'zerocard-wallet.jpg';
       const base64Data = capturedImage.split(',')[1];
-      
+
       await FileSystem.writeAsStringAsync(fileUri, base64Data, {
         encoding: FileSystem.EncodingType.Base64,
       });
-      
+
       // Save the image to the media library
       const asset = await MediaLibrary.createAssetAsync(fileUri);
       await MediaLibrary.createAlbumAsync('ZeroCard', asset, false);
-      
+
       Alert.alert('Success', 'Wallet address saved to your gallery');
       setShowModal(false);
     } catch (error) {
@@ -205,11 +206,11 @@ export default function LoadWalletScreen() {
     const subscription = ScreenCapture.addScreenshotListener(() => {
       const now = Date.now();
       if (now - lastScreenshotTime < 1000) return;
-      
+
       setLastScreenshotTime(now);
       captureScreenshot();
     });
-    
+
     return () => subscription.remove();
   }, [captureScreenshot, lastScreenshotTime]);
 
@@ -219,20 +220,16 @@ export default function LoadWalletScreen() {
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
       {/* Beta Toast Notification */}
-      <BetaToast 
-        visible={true} 
-        onDismiss={() => {}} 
-      />
-      
+      <BetaToast visible={true} onDismiss={() => {}} />
+
       {/* ViewShot Component - This is what will be captured */}
-      <ViewShot 
+      <ViewShot
         ref={viewShotRef}
         options={{
           format: 'jpg',
           quality: 0.9,
         }}
-        style={[styles.viewShotContainer, { opacity: viewShotOpacity }]}
-      >
+        style={[styles.viewShotContainer, { opacity: viewShotOpacity }]}>
         {/* Content to be captured in screenshot */}
         <View style={styles.screenshotContent}>
           {/* Main content container to match CSS spec */}
@@ -246,85 +243,77 @@ export default function LoadWalletScreen() {
                   <Text style={styles.usdcText}>USDC</Text>
                 </View>
               </View>
-              
+
               {/* QR Code Container */}
               <View style={styles.qrCodeContainer}>
                 <QRCode
-                  value={"0xf235c72e61d7339c76f6b36d8d8c0b6h92F"}
+                  value={'0xf235c72e61d7339c76f6b36d8d8c0b6h92F'}
                   size={280}
                   color="#000000"
                   backgroundColor="#ffffff"
                   logoBackgroundColor="white"
                 />
               </View>
-              
+
               {/* Caution info container */}
               <View style={styles.cautionContainer}>
                 <SvgXml xml={infoWalletSvg} width={16} height={16} />
                 <Text style={styles.cautionText}>
-                  Only send USDC on Base to this address, it is only enabled to hold ERC20 tokens on Base
+                  Only send USDC on Base to this address, it is only enabled to hold ERC20 tokens on
+                  Base
                 </Text>
               </View>
             </View>
           </View>
-          
+
           {/* Branding container at bottom */}
           <View style={styles.brandingContainer}>
             <SvgXml xml={zeroCardLogoSvg} width={37} height={28} />
             <View style={styles.divider} />
-            <Text style={styles.brandingText}>
-              This wallet is provided by{'\n'}Zerocard
-            </Text>
+            <Text style={styles.brandingText}>This wallet is provided by{'\n'}Zerocard</Text>
           </View>
         </View>
       </ViewShot>
-      
+
       {/* The actual AddMoney component - not in the screenshot */}
       <View style={styles.addMoneyWrapper}>
-        <AddMoney 
-          onFundedWallet={handleFundedWallet}
-          onSkip={handleSkip}
-        />
+        <AddMoney onFundedWallet={handleFundedWallet} onSkip={handleSkip} />
       </View>
-      
+
       {/* Modal for displaying captured screenshot */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={showModal}
-        onRequestClose={() => setShowModal(false)}
-      >
+        onRequestClose={() => setShowModal(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Your Wallet Screenshot</Text>
-            
+
             {capturedImage && (
-              <Image 
-                source={{ uri: capturedImage }} 
-                style={styles.screenshotImage} 
+              <Image
+                source={{ uri: capturedImage }}
+                style={styles.screenshotImage}
                 resizeMode="contain"
               />
             )}
-            
+
             <View style={styles.modalButtonsContainer}>
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.shareButton]} 
-                onPress={handleShare}
-              >
+              <TouchableOpacity
+                style={[styles.modalButton, styles.shareButton]}
+                onPress={handleShare}>
                 <Text style={styles.modalButtonText}>Share</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.saveButton]} 
-                onPress={handleSave}
-              >
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleSave}>
                 <Text style={styles.modalButtonText}>Save</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]} 
-                onPress={() => setShowModal(false)}
-              >
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowModal(false)}>
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
@@ -482,7 +471,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     maxWidth: 190,
   },
-  
+
   // Modal styles
   modalContainer: {
     flex: 1,
@@ -547,4 +536,4 @@ const styles = StyleSheet.create({
     color: '#121212',
     fontWeight: '600',
   },
-}); 
+});

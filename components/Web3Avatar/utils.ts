@@ -14,16 +14,16 @@ export function generateGradientColors(address: string): string[] {
 
   // Clean and normalize the address
   const cleanAddress = address.toLowerCase().replace(/^0x/, '');
-  
+
   // Generate 3 colors from different parts of the address
   const rgbColors: RGB[] = [
     getColorFromHex(cleanAddress.substring(0, 10)),
     getColorFromHex(cleanAddress.substring(10, 20)),
     getColorFromHex(cleanAddress.substring(20, 30) || cleanAddress.substring(0, 10)),
   ];
-  
+
   // Convert RGB objects to CSS color strings
-  return rgbColors.map(color => `rgb(${color.r}, ${color.g}, ${color.b})`);
+  return rgbColors.map((color) => `rgb(${color.r}, ${color.g}, ${color.b})`);
 }
 
 /**
@@ -34,12 +34,12 @@ export function generateGradientColors(address: string): string[] {
 function getColorFromHex(hex: string): RGB {
   // Create a 32-bit FNV-1a hash
   const fnv = getFnv32Hash(hex);
-  
+
   // Use different bits for each color component
   return {
-    r: (fnv & 0xFF0000) >> 16,
-    g: (fnv & 0x00FF00) >> 8,
-    b: fnv & 0x0000FF,
+    r: (fnv & 0xff0000) >> 16,
+    g: (fnv & 0x00ff00) >> 8,
+    b: fnv & 0x0000ff,
   };
 }
 
@@ -51,11 +51,11 @@ function getColorFromHex(hex: string): RGB {
 function getFnv32Hash(str: string): number {
   let hash = 0x811c9dc5; // FNV offset basis
   const prime = 0x01000193; // FNV prime
-  
+
   for (let i = 0; i < str.length; i++) {
     hash ^= str.charCodeAt(i);
     hash = Math.imul(hash, prime);
   }
-  
+
   return hash >>> 0; // Convert to unsigned 32-bit integer
-} 
+}

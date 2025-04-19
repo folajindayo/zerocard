@@ -1,20 +1,20 @@
 import React, { useEffect } from 'react';
-import { 
-  Modal, 
-  View, 
-  Text, 
-  StyleSheet, 
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
   Dimensions,
   TouchableWithoutFeedback,
   Platform,
   TouchableOpacity,
 } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
   withTiming,
-  Easing
+  Easing,
 } from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
 import { Button } from './Button';
@@ -63,38 +63,38 @@ interface AndroidCardTypeModalProps {
 const AndroidCardTypeModal: React.FC<AndroidCardTypeModalProps> = ({
   visible,
   onClose,
-  onSelectCardType
+  onSelectCardType,
 }) => {
   const { height } = Dimensions.get('window');
-  
+
   // Animation values
   const translateY = useSharedValue(height);
   const opacity = useSharedValue(0);
-  
+
   // Handle animation when visibility changes
   useEffect(() => {
     if (visible) {
       opacity.value = withTiming(1, { duration: 300 });
-      translateY.value = withSpring(0, { 
+      translateY.value = withSpring(0, {
         damping: 15,
-        stiffness: 100
+        stiffness: 100,
       });
     } else {
       opacity.value = withTiming(0, { duration: 200 });
       translateY.value = withSpring(height, {
         damping: 15,
-        stiffness: 100
+        stiffness: 100,
       });
     }
   }, [visible, height]);
-  
+
   // Animated styles
   const backdropStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
     };
   });
-  
+
   const modalStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateY: translateY.value }],
@@ -105,20 +105,19 @@ const AndroidCardTypeModal: React.FC<AndroidCardTypeModalProps> = ({
   if (Platform.OS !== 'android') {
     return null;
   }
-  
+
   return (
     <Modal
       transparent
       visible={visible}
       animationType="none"
       statusBarTranslucent={true}
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.container}>
           {/* Backdrop */}
           <Animated.View style={[styles.backdrop, backdropStyle]} />
-          
+
           {/* Modal Content */}
           <Animated.View style={[styles.modalAnimatedContainer, modalStyle]}>
             <View style={styles.modalContainer}>
@@ -126,18 +125,17 @@ const AndroidCardTypeModal: React.FC<AndroidCardTypeModalProps> = ({
                 <Text style={styles.title}>Select card type</Text>
                 <Text style={styles.subtitle}>Choose the type of card you'd like to own</Text>
               </View>
-              
+
               <View style={styles.cardOptionsContainer}>
                 {/* Physical Card Option */}
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.cardOption}
                   onPress={() => {
                     onSelectCardType('physical');
                     onClose();
                     // For Android, navigate to order-card as a modal
-                    router.push("/(tab)/home/order-card");
-                  }}
-                >
+                    router.push('/(tab)/home/order-card');
+                  }}>
                   <SvgXml xml={physicalCardSvg} width={36} height={36} />
                   <View style={styles.cardOptionContent}>
                     <Text style={styles.cardOptionTitle}>Physical card</Text>
@@ -146,7 +144,7 @@ const AndroidCardTypeModal: React.FC<AndroidCardTypeModalProps> = ({
                     </Text>
                   </View>
                 </TouchableOpacity>
-                
+
                 {/* Contactless Card Option - Disabled */}
                 <View style={[styles.cardOption, styles.disabledCardOption]}>
                   <SvgXml xml={contactlessSvg} width={36} height={36} />
@@ -315,4 +313,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AndroidCardTypeModal; 
+export default AndroidCardTypeModal;

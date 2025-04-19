@@ -48,48 +48,48 @@ const CardModule: React.FC<CardModuleProps> = ({
   const maskedCardNumber = '**** **** **** 0987';
   // The real card number to show after authentication - for demo we'll use a dummy card number
   const realCardNumber = '4242 4242 4242 4242';
-  
+
   // Function to handle biometric authentication
   const authenticateWithBiometrics = async () => {
     try {
       // Check if device supports biometric authentication
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       if (!hasHardware) {
-        Alert.alert('Error', 'Your device doesn\'t support biometric authentication');
+        Alert.alert('Error', "Your device doesn't support biometric authentication");
         return;
       }
-      
+
       // Check if biometrics are enrolled
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
       if (!isEnrolled) {
         Alert.alert(
-          'No Biometrics Found', 
+          'No Biometrics Found',
           'Please set up biometrics in your device settings or use your device PIN/password.',
           [
-            { 
-              text: 'Cancel', 
-              style: 'cancel' 
+            {
+              text: 'Cancel',
+              style: 'cancel',
             },
-            { 
-              text: 'Use PIN', 
-              onPress: () => authenticateWithFallback() 
-            }
+            {
+              text: 'Use PIN',
+              onPress: () => authenticateWithFallback(),
+            },
           ]
         );
         return;
       }
-      
+
       // Attempt biometric authentication
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: 'Authenticate to view card details',
         fallbackLabel: 'Use PIN/Password',
         disableDeviceFallback: false,
       });
-      
+
       if (result.success) {
         // Authentication succeeded, reveal card number
         setIsCardNumberRevealed(true);
-        
+
         // Auto-hide card number after 30 seconds
         setTimeout(() => {
           setIsCardNumberRevealed(false);
@@ -100,7 +100,7 @@ const CardModule: React.FC<CardModuleProps> = ({
       Alert.alert('Error', 'Authentication failed. Please try again.');
     }
   };
-  
+
   // Fallback authentication method using device PIN/password
   const authenticateWithFallback = async () => {
     try {
@@ -108,10 +108,10 @@ const CardModule: React.FC<CardModuleProps> = ({
         promptMessage: 'Enter your device PIN/password',
         fallbackLabel: 'Use PIN/Password',
       });
-      
+
       if (result.success) {
         setIsCardNumberRevealed(true);
-        
+
         // Auto-hide card number after 30 seconds
         setTimeout(() => {
           setIsCardNumberRevealed(false);
@@ -122,26 +122,25 @@ const CardModule: React.FC<CardModuleProps> = ({
       Alert.alert('Error', 'Authentication failed. Please try again.');
     }
   };
-  
+
   return (
     <View style={styles.container}>
       {/* Card Base (Bottom Layer) */}
-      <SquircleView 
+      <SquircleView
         style={styles.cardBaseContainer}
         squircleParams={{
           cornerSmoothing: 1, // 100% corner smoothing
           cornerRadius: 20,
           fillColor: '#E2E2E2',
-        }}
-      >
+        }}>
         <View style={styles.cardBasePlaceholder} />
       </SquircleView>
-      
+
       {/* Wallet Base (Middle Layer) */}
       <View style={styles.walletBaseContainer}>
         <SvgXml xml={walletBaseSvg} width="100%" height="100%" />
       </View>
-      
+
       {/* Main Card (Top Layer) */}
       <SquircleView
         style={styles.mainCard}
@@ -149,14 +148,12 @@ const CardModule: React.FC<CardModuleProps> = ({
           cornerSmoothing: 1, // 100% corner smoothing
           cornerRadius: 20,
           fillColor: 'transparent',
-        }}
-      >
+        }}>
         <LinearGradient
           colors={['#323232', '#000000']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={styles.gradientFill}
-        >
+          style={styles.gradientFill}>
           <View style={styles.cardContent}>
             {/* Top Row with Logo and Wallet Address */}
             <View style={styles.topRow}>
@@ -167,19 +164,18 @@ const CardModule: React.FC<CardModuleProps> = ({
                   cornerSmoothing: 1, // 100% corner smoothing
                   cornerRadius: 16,
                   fillColor: '#292929',
-                }}
-              >
+                }}>
                 <Text style={styles.walletAddressText}>{walletAddress}</Text>
               </SquircleView>
             </View>
-            
+
             {/* Card Number - Touchable to reveal */}
             <TouchableOpacity onPress={authenticateWithBiometrics} activeOpacity={0.7}>
               <Text style={styles.cardNumber}>
                 {isCardNumberRevealed ? realCardNumber : maskedCardNumber}
               </Text>
             </TouchableOpacity>
-            
+
             {/* Bottom Row with Name and Expiry */}
             <View style={styles.bottomRow}>
               <Text style={styles.cardHolderName}>{cardHolderName}</Text>
@@ -195,7 +191,7 @@ const CardModule: React.FC<CardModuleProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    aspectRatio: 354/246,
+    aspectRatio: 354 / 246,
     alignSelf: 'stretch',
   },
   cardBaseContainer: {
@@ -280,4 +276,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CardModule; 
+export default CardModule;

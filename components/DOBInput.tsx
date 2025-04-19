@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  StyleSheet,
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { useFonts } from 'expo-font';
@@ -50,8 +50,18 @@ interface DOBInputProps {
 }
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 const DOB_DRAFT_KEY = 'DOB_DRAFT_DATA';
@@ -63,7 +73,7 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
   const [focused, setFocused] = useState<'year' | 'month' | 'day'>('year');
   const [isTouched, setIsTouched] = useState(false);
   const [showPhoneInput, setShowPhoneInput] = useState(false);
-  
+
   const yearRef = useRef<TextInput>(null);
   const monthRef = useRef<TextInput>(null);
   const dayRef = useRef<TextInput>(null);
@@ -86,7 +96,7 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
         console.error('Error loading draft:', error);
       }
     };
-    
+
     loadDraft();
   }, []);
 
@@ -122,7 +132,7 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
     const numericValue = text.replace(/[^0-9]/g, '').slice(0, 4);
     setYear(numericValue);
     setIsTouched(true);
-    
+
     // Move to month input when year is fully entered
     if (numericValue.length === 4) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -135,7 +145,7 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
     const numericValue = text.replace(/[^0-9]/g, '').slice(0, 2);
     setMonth(numericValue);
     setIsTouched(true);
-    
+
     // Auto-format month (01-12) and move to day
     if (numericValue.length === 1 && parseInt(numericValue) > 1) {
       // If user enters a month > 1, prepend a 0 (e.g., "5" becomes "05")
@@ -155,7 +165,7 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
     const numericValue = text.replace(/[^0-9]/g, '').slice(0, 2);
     setDay(numericValue);
     setIsTouched(true);
-    
+
     // Auto-format day (01-31) and blur field when complete
     if (numericValue.length === 1 && parseInt(numericValue) > 3) {
       // If user enters a day > 3, prepend a 0 (e.g., "5" becomes "05")
@@ -171,7 +181,7 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
 
   const formatDateInWords = () => {
     if (!isFormComplete || !isFormValid) return null;
-    
+
     const monthName = MONTHS[parseInt(month) - 1];
     const formattedDay = parseInt(day).toString();
     return `${monthName} ${formattedDay}, ${year}`;
@@ -181,10 +191,10 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
     if (isFormValid) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       const formattedDOB = `${year}-${month}-${day}`;
-      
+
       // Show PhoneInput component instead of calling onContinue
       setShowPhoneInput(true);
-      
+
       // If onContinue prop is provided, call it with the formatted date
       if (onContinue) {
         onContinue(formattedDOB);
@@ -215,34 +225,22 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
 
   // If showPhoneInput is true, render PhoneInput instead of DOBInput
   if (showPhoneInput) {
-    return (
-      <PhoneInput
-        onClose={onClose}
-        onBack={handleBackFromPhoneInput}
-        userName={userName}
-      />
-    );
+    return <PhoneInput onClose={onClose} onBack={handleBackFromPhoneInput} userName={userName} />;
   }
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView 
+      style={styles.container}>
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
         {onBack && (
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={onBack}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
             <SvgXml xml={backArrowIconSvg} width={24} height={24} />
           </TouchableOpacity>
         )}
-        
+
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <Text style={styles.titleText}>
@@ -252,12 +250,12 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
               Birthdays are important, and we don't want to miss yours
             </Text>
           </View>
-          
+
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <SvgXml xml={closeIconSvg} width={24} height={24} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.dobContainer}>
           <View style={styles.dateFieldContainer}>
             <View style={styles.dateInputRow}>
@@ -265,9 +263,9 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
               <TextInput
                 ref={yearRef}
                 style={[
-                  styles.yearInput, 
+                  styles.yearInput,
                   year && styles.filledInput,
-                  year && !isYearValid() && styles.invalidInput
+                  year && !isYearValid() && styles.invalidInput,
                 ]}
                 placeholder="YYYY"
                 placeholderTextColor="#A2A2A2"
@@ -278,16 +276,16 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
                 onFocus={() => setFocused('year')}
                 autoFocus
               />
-              
+
               <Text style={styles.dateSeparator}>.</Text>
-              
+
               {/* Month Field */}
               <TextInput
                 ref={monthRef}
                 style={[
-                  styles.monthInput, 
+                  styles.monthInput,
                   month && styles.filledInput,
-                  month && !isMonthValid() && styles.invalidInput
+                  month && !isMonthValid() && styles.invalidInput,
                 ]}
                 placeholder="MM"
                 placeholderTextColor="#A2A2A2"
@@ -297,16 +295,16 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
                 maxLength={2}
                 onFocus={() => setFocused('month')}
               />
-              
+
               <Text style={styles.dateSeparator}>.</Text>
-              
+
               {/* Day Field */}
               <TextInput
                 ref={dayRef}
                 style={[
-                  styles.dayInput, 
+                  styles.dayInput,
                   day && styles.filledInput,
-                  day && !isDayValid() && styles.invalidInput
+                  day && !isDayValid() && styles.invalidInput,
                 ]}
                 placeholder="DD"
                 placeholderTextColor="#A2A2A2"
@@ -318,53 +316,40 @@ const DOBInput: React.FC<DOBInputProps> = ({ onClose, onBack, onContinue, userNa
               />
             </View>
           </View>
-          
+
           {/* Status message */}
           <View style={styles.statusContainer}>
             {!isTouched && (
               <>
                 <SvgXml xml={infoCircleIconSvg} width={14} height={14} />
-                <Text style={styles.infoText}>
-                  We are not saving your date of birth
-                </Text>
+                <Text style={styles.infoText}>We are not saving your date of birth</Text>
               </>
             )}
-            
+
             {isTouched && isFormComplete && !isFormValid && (
               <>
                 <SvgXml xml={errorCircleIconSvg} width={16} height={16} />
-                <Text style={styles.errorText}>
-                  Enter a valid date of birth
-                </Text>
+                <Text style={styles.errorText}>Enter a valid date of birth</Text>
               </>
             )}
-            
+
             {isTouched && isFormValid && (
               <>
                 <SvgXml xml={successCircleIconSvg} width={16} height={16} />
-                <Text style={styles.successText}>
-                  {formatDateInWords()}
-                </Text>
+                <Text style={styles.successText}>{formatDateInWords()}</Text>
               </>
             )}
           </View>
         </View>
-        
-        <TouchableOpacity 
-          style={[
-            styles.continueButton, 
-            !isFormValid && styles.continueButtonDisabled
-          ]}
+
+        <TouchableOpacity
+          style={[styles.continueButton, !isFormValid && styles.continueButtonDisabled]}
           onPress={handleContinue}
-          disabled={!isFormValid}
-        >
+          disabled={!isFormValid}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.saveDraftButton}
-          onPress={saveDraft}
-        >
+
+        <TouchableOpacity style={styles.saveDraftButton} onPress={saveDraft}>
           <Text style={styles.saveDraftButtonText}>Save draft</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -553,4 +538,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DOBInput; 
+export default DOBInput;

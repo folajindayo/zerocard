@@ -31,7 +31,8 @@
             "compileSdkVersion": 34
           }
         }
-      ]
+      ],
+      "expo-barcode-scanner"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -45,9 +46,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#f7f7f7"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "newArchEnabled": true,
@@ -56,14 +55,16 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         }
-      }
+      },
+      "bundleIdentifier": "com.zerocard.zerocard"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/base-logo-in-blue.png",
         "backgroundColor": "#ffffff"
       },
-      "newArchEnabled": true
+      "newArchEnabled": true,
+      "package": "com.zerocard.zerocard"
     },
     "extra": {}
   }

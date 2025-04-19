@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Modal, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
   Dimensions,
   Animated,
   Easing,
-  Image
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
@@ -34,7 +34,7 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
   timestamp,
   transactionHash,
   chain = 'Base',
-  position
+  position,
 }) => {
   const opacity = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(100)).current;
@@ -47,14 +47,14 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
           toValue: 1,
           duration: 300,
           useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
+          easing: Easing.out(Easing.ease),
         }),
         Animated.timing(translateY, {
           toValue: 0,
           duration: 300,
           useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
-        })
+          easing: Easing.out(Easing.ease),
+        }),
       ]).start();
     } else {
       Animated.parallel([
@@ -62,14 +62,14 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
           toValue: 0,
           duration: 200,
           useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
+          easing: Easing.in(Easing.ease),
         }),
         Animated.timing(translateY, {
           toValue: 100,
           duration: 200,
           useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
-        })
+          easing: Easing.in(Easing.ease),
+        }),
       ]).start();
     }
   }, [visible, opacity, translateY]);
@@ -88,45 +88,33 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
   };
 
   return (
-    <Modal
-      transparent
-      visible={visible}
-      animationType="none"
-      onRequestClose={onClose}
-    >
+    <Modal transparent visible={visible} animationType="none" onRequestClose={onClose}>
       <BlurBackground visible={visible} intensity={40} tint="dark" />
-      
-      <TouchableOpacity 
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={onClose}
-      >
-        <Animated.View 
+
+      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
+        <Animated.View
           style={[
             styles.modalAnimatedContainer,
-            { 
+            {
               left: positionStyle.left,
-              top: positionStyle.top
+              top: positionStyle.top,
             },
             {
               opacity,
-              transform: [{ translateY }]
-            }
-          ]}
-        >
+              transform: [{ translateY }],
+            },
+          ]}>
           <SquircleView
             style={styles.modalContainer}
             squircleParams={{
               cornerSmoothing: 1,
               cornerRadius: 30,
               fillColor: '#F7F7F7',
-            }}
-          >
-            <TouchableOpacity 
-              activeOpacity={1} 
+            }}>
+            <TouchableOpacity
+              activeOpacity={1}
               onPress={(e) => e.stopPropagation()}
-              style={styles.modalTouchable}
-            >
+              style={styles.modalTouchable}>
               <View style={styles.contentWrapper}>
                 {/* Header with icon */}
                 <View style={styles.headerIconContainer}>
@@ -134,17 +122,21 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
                     {/* USDC icon */}
                     <SvgXml xml={usdcSvg} width={48} height={48} />
                     <View style={styles.usdcIcon}>
-                      <Image 
-                        source={require('../../assets/received-icon.png')} 
-                        style={styles.receivedIcon} 
+                      <Image
+                        source={require('../../assets/received-icon.png')}
+                        style={styles.receivedIcon}
                       />
                     </View>
                   </View>
-                  
+
                   <Text style={styles.headerText}>
-                    You just received <Text style={styles.highlightText}>{amount} {currency}</Text> on <Text style={styles.addressText}>Oxbaed..4g62f</Text>
+                    You just received{' '}
+                    <Text style={styles.highlightText}>
+                      {amount} {currency}
+                    </Text>{' '}
+                    on <Text style={styles.addressText}>Oxbaed..4g62f</Text>
                   </Text>
-                  
+
                   <View style={styles.timestampContainer}>
                     <Text style={styles.timestampText}>{timestamp.date}</Text>
                     <Text style={styles.timestampText}>{timestamp.time}</Text>
@@ -158,24 +150,23 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
                     cornerSmoothing: 1,
                     cornerRadius: 20,
                     fillColor: '#FFFFFF',
-                  }}
-                >
+                  }}>
                   {/* Chain & Network details */}
                   <View style={styles.detailRow}>
                     <View style={styles.detailContent}>
                       <Text style={styles.detailLabel}>Chain</Text>
                       <View style={styles.chainValue}>
-                        <Image 
-                          source={require('../../assets/base-logo-in-blue.png')} 
-                          style={styles.chainLogo} 
+                        <Image
+                          source={require('../../assets/base-logo-in-blue.png')}
+                          style={styles.chainLogo}
                         />
                         <Text style={styles.detailValue}>{chain}</Text>
                       </View>
                     </View>
                   </View>
-                  
+
                   <View style={styles.separator} />
-                  
+
                   {/* Amount details */}
                   <View style={styles.detailRow}>
                     <View style={styles.detailContent}>
@@ -193,8 +184,7 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
                       cornerSmoothing: 1,
                       cornerRadius: 1000,
                       fillColor: '#FFFFFF',
-                    }}
-                  >
+                    }}>
                     <View style={styles.hashButtonContent}>
                       <Text style={styles.hashLabel}>Txn Hash</Text>
                       <View style={styles.viewHashContainer}>

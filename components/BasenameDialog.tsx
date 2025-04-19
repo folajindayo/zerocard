@@ -27,20 +27,19 @@ const BasenameDialog: React.FC = () => {
         cornerRadius: 20,
         cornerSmoothing: 1,
         fillColor: '#ECECEC',
-      }}
-    >
+      }}>
       <TouchableOpacity style={styles.container} onPress={handlePress}>
         <View style={styles.iconContainer}>
           <SvgXml xml={basenameIconSvg} width={36} height={36} />
         </View>
-        
+
         <View style={styles.textContainer}>
           <Text style={styles.title}>Get a basename</Text>
           <Text style={styles.description}>
             Access and manage your personal decentralized identity directly
           </Text>
         </View>
-        
+
         <View style={styles.arrowContainer}>
           <SvgXml xml={arrowUpIconSvg} width={18} height={18} />
         </View>
@@ -86,7 +85,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 17,
     color: '#484848',
-  }
+  },
 });
 
-export default BasenameDialog; 
+export default BasenameDialog;

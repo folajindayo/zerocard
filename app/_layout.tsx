@@ -21,28 +21,25 @@ export default function RootLayout() {
     if (!privyAppId || !privyClientId) {
       console.warn(
         'Privy App ID or Client ID not found in environment variables. ' +
-        'Ensure EXPO_PUBLIC_PRIVY_APP_ID and EXPO_PUBLIC_PRIVY_CLIENT_ID are set in your .env file.'
+          'Ensure EXPO_PUBLIC_PRIVY_APP_ID and EXPO_PUBLIC_PRIVY_CLIENT_ID are set in your .env file.'
       );
     }
   }, [privyAppId, privyClientId]);
-  
+
   // Ensure PrivyProvider receives valid strings
   if (!privyAppId || !privyClientId) {
     // Optionally render a loading state or error message if IDs are missing
-    console.error("Privy IDs are missing from environment variables!");
+    console.error('Privy IDs are missing from environment variables!');
     // Return null or an error component to prevent app crash
-    return null; 
+    return null;
   }
 
   return (
-    <PrivyProvider
-      appId={privyAppId}
-      clientId={privyClientId}
-    >
+    <PrivyProvider appId={privyAppId} clientId={privyClientId}>
       {/* Network status toast notification */}
       <NetworkStatus />
-      
-      <Stack 
+
+      <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: '#f7f7f7' },
@@ -51,4 +48,4 @@ export default function RootLayout() {
       <PrivyElements />
     </PrivyProvider>
   );
-} 
+}

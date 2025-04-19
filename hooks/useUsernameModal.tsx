@@ -33,19 +33,19 @@ interface UsernameModalProviderProps {
 // Get the screen dimensions
 const { width, height } = Dimensions.get('window');
 
-export const UsernameModalProvider: React.FC<UsernameModalProviderProps> = ({ 
+export const UsernameModalProvider: React.FC<UsernameModalProviderProps> = ({
   children,
-  initialUsername = ''
+  initialUsername = '',
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [hasSetUsername, setHasSetUsername] = useState(false);
-  
+
   // Check if user has already set a username on first load
   useEffect(() => {
     const checkUsernameSet = async () => {
       try {
         const usernameSet = await AsyncStorage.getItem(USERNAME_SET_KEY);
-        
+
         if (usernameSet !== 'true') {
           // For new users, show the modal automatically
           // We can add a slight delay to allow the app to load first
@@ -59,7 +59,7 @@ export const UsernameModalProvider: React.FC<UsernameModalProviderProps> = ({
         console.error('Error checking username status:', error);
       }
     };
-    
+
     checkUsernameSet();
   }, []);
 
@@ -78,11 +78,11 @@ export const UsernameModalProvider: React.FC<UsernameModalProviderProps> = ({
     try {
       // Save the username (this would typically connect to your backend)
       console.log(`Setting username to: ${username}`);
-      
+
       // Mark that the user has set their username
       await AsyncStorage.getItem(USERNAME_SET_KEY);
       await AsyncStorage.setItem(USERNAME_SET_KEY, 'true');
-      
+
       setHasSetUsername(true);
       hideUsernameModal();
     } catch (error) {
@@ -91,17 +91,16 @@ export const UsernameModalProvider: React.FC<UsernameModalProviderProps> = ({
   };
 
   return (
-    <UsernameModalContext.Provider 
-      value={{ 
-        showUsernameModal, 
+    <UsernameModalContext.Provider
+      value={{
+        showUsernameModal,
         hideUsernameModal,
         setUsername,
         hasSetUsername,
-        isVisible 
-      }}
-    >
+        isVisible,
+      }}>
       {children}
-      
+
       <UsernameModal
         visible={isVisible}
         onClose={hideUsernameModal}
@@ -115,11 +114,11 @@ export const UsernameModalProvider: React.FC<UsernameModalProviderProps> = ({
 // Custom hook for using the username modal
 export const useUsernameModal = () => {
   const context = useContext(UsernameModalContext);
-  
+
   if (context === undefined) {
     throw new Error('useUsernameModal must be used within a UsernameModalProvider');
   }
-  
+
   return context;
 };
 
@@ -146,4 +145,4 @@ const OnboardingScreen = () => {
     </View>
   );
 };
-*/ 
+*/

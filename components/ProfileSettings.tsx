@@ -54,7 +54,7 @@ const arrowUpIconSvg = `<svg width="24" height="24" viewBox="0 0 18 18" fill="no
 const ProfileSettings: React.FC = () => {
   const [biometricsEnabled, setBiometricsEnabled] = useState(true);
   const userData = mockData.user || {};
-  
+
   // Set default values or use values from mockData
   const username = userData.username || 'Temidayo Folajin';
   const email = userData.email || 'dayofolajin@gmail.com';
@@ -93,8 +93,7 @@ const ProfileSettings: React.FC = () => {
           style={styles.squircleContainer}
           borderRadius={16}
           borderSmoothing={1}
-          backgroundColor="#FFFFFF"
-        >
+          backgroundColor="#FFFFFF">
           <View style={styles.sectionContentInner}>
             {/* Name */}
             <View style={[styles.row, styles.topRow]}>
@@ -104,7 +103,7 @@ const ProfileSettings: React.FC = () => {
               </View>
               <Text style={styles.rowValue}>{username}</Text>
             </View>
-            
+
             {/* Email */}
             <View style={styles.row}>
               <View style={styles.rowLeft}>
@@ -113,7 +112,7 @@ const ProfileSettings: React.FC = () => {
               </View>
               <Text style={styles.rowValue}>{email}</Text>
             </View>
-            
+
             {/* Phone */}
             <View style={[styles.row, styles.bottomRow]}>
               <View style={styles.rowLeft}>
@@ -135,8 +134,7 @@ const ProfileSettings: React.FC = () => {
           style={styles.squircleContainer}
           borderRadius={16}
           borderSmoothing={1}
-          backgroundColor="#FFFFFF"
-        >
+          backgroundColor="#FFFFFF">
           <View style={styles.sectionContentInner}>
             {/* Biometrics */}
             <View style={[styles.row, styles.singleRow]}>
@@ -166,8 +164,7 @@ const ProfileSettings: React.FC = () => {
           style={styles.squircleContainer}
           borderRadius={16}
           borderSmoothing={1}
-          backgroundColor="#FFFFFF"
-        >
+          backgroundColor="#FFFFFF">
           <View style={styles.sectionContentInner}>
             {/* Help Center */}
             <TouchableOpacity style={[styles.row, styles.topRow]} onPress={handleHelpPress}>
@@ -177,7 +174,7 @@ const ProfileSettings: React.FC = () => {
               </View>
               <SvgXml xml={arrowUpIconSvg} width={24} height={24} />
             </TouchableOpacity>
-            
+
             {/* Terms of Use */}
             <TouchableOpacity style={styles.row} onPress={handleTermsPress}>
               <View style={styles.rowLeft}>
@@ -186,7 +183,7 @@ const ProfileSettings: React.FC = () => {
               </View>
               <SvgXml xml={arrowUpIconSvg} width={24} height={24} />
             </TouchableOpacity>
-            
+
             {/* Privacy Policy */}
             <TouchableOpacity style={[styles.row, styles.bottomRow]} onPress={handlePrivacyPress}>
               <View style={styles.rowLeft}>
@@ -205,8 +202,7 @@ const ProfileSettings: React.FC = () => {
           style={styles.squircleContainer}
           borderRadius={16}
           borderSmoothing={1}
-          backgroundColor="#FFFFFF"
-        >
+          backgroundColor="#FFFFFF">
           <View style={styles.sectionContentInner}>
             {/* Logout */}
             <TouchableOpacity style={[styles.row, styles.topRow]} onPress={handleLogout}>
@@ -215,7 +211,7 @@ const ProfileSettings: React.FC = () => {
                 <Text style={[styles.rowLabel, styles.logoutText]}>Log out</Text>
               </View>
             </TouchableOpacity>
-            
+
             {/* Close Account */}
             <TouchableOpacity style={[styles.row, styles.bottomRow]} onPress={handleCloseAccount}>
               <Text style={[styles.rowLabel, styles.closeAccountText]}>Close account</Text>
@@ -305,4 +301,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileSettings; 
+export default ProfileSettings;

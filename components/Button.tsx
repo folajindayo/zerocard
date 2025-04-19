@@ -10,37 +10,22 @@ type ButtonProps = {
   showRightArrow?: boolean;
 } & TouchableOpacityProps;
 
-export const Button = forwardRef<View, ButtonProps>(({ 
-  title, 
-  variant = 'primary', 
-  showRightArrow = false,
-  style,
-  ...touchableProps 
-}, ref) => {
-  const buttonStyle = variant === 'primary' 
-    ? styles.primaryButton 
-    : styles.secondaryButton;
-  
-  const textStyle = styles.buttonText;
-  
-  return (
-    <TouchableOpacity 
-      ref={ref} 
-      style={[buttonStyle, style]} 
-      {...touchableProps}
-    >
-      <Text style={textStyle}>{title}</Text>
-      {showRightArrow && (
-        <Feather 
-          name="arrow-right" 
-          size={16} 
-          color="#292D32" 
-          style={styles.arrowIcon} 
-        />
-      )}
-    </TouchableOpacity>
-  );
-});
+export const Button = forwardRef<View, ButtonProps>(
+  ({ title, variant = 'primary', showRightArrow = false, style, ...touchableProps }, ref) => {
+    const buttonStyle = variant === 'primary' ? styles.primaryButton : styles.secondaryButton;
+
+    const textStyle = styles.buttonText;
+
+    return (
+      <TouchableOpacity ref={ref} style={[buttonStyle, style]} {...touchableProps}>
+        <Text style={textStyle}>{title}</Text>
+        {showRightArrow && (
+          <Feather name="arrow-right" size={16} color="#292D32" style={styles.arrowIcon} />
+        )}
+      </TouchableOpacity>
+    );
+  }
+);
 
 // Container styles for button groups (can be used by parent components)
 export const buttonContainerStyles = StyleSheet.create({
@@ -54,7 +39,7 @@ export const buttonContainerStyles = StyleSheet.create({
     width: 354,
     height: 114,
     alignSelf: 'stretch',
-  }
+  },
 });
 
 const styles = StyleSheet.create({
@@ -110,5 +95,5 @@ const styles = StyleSheet.create({
     height: 16,
     marginLeft: 8,
     transform: [{ scaleX: -1 }],
-  }
+  },
 });

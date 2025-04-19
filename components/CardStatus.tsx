@@ -35,22 +35,17 @@ const CardStatusComponent: React.FC<CardStatusProps> = ({
 
   // Content based on status
   const iconSvg = status === 'not_found' ? cardNotFoundSvg : cardSendSvg;
-  
-  const title = status === 'not_found' 
-    ? 'No card found 😕' 
-    : 'Card arrived?';
-    
-  const description = status === 'not_found'
-    ? 'Looks like you don\'t have a ZeroCard yet. Order one now to start spending crypto like cash'
-    : 'Your card should arrive shortly. Once you have it, you can activate your new card below';
-    
-  const primaryButtonTitle = status === 'not_found' 
-    ? 'Order card' 
-    : 'Activate card';
-    
-  const secondaryButtonTitle = status === 'not_found' 
-    ? 'Load wallet' 
-    : 'Check status';
+
+  const title = status === 'not_found' ? 'No card found 😕' : 'Card arrived?';
+
+  const description =
+    status === 'not_found'
+      ? "Looks like you don't have a ZeroCard yet. Order one now to start spending crypto like cash"
+      : 'Your card should arrive shortly. Once you have it, you can activate your new card below';
+
+  const primaryButtonTitle = status === 'not_found' ? 'Order card' : 'Activate card';
+
+  const secondaryButtonTitle = status === 'not_found' ? 'Load wallet' : 'Check status';
 
   const handlePrimaryButtonPress = () => {
     if (status === 'not_found' && Platform.OS === 'android') {
@@ -67,7 +62,7 @@ const CardStatusComponent: React.FC<CardStatusProps> = ({
       onPrimaryButtonPress();
     }
   };
-  
+
   return (
     <>
       <SquircleView
@@ -76,27 +71,26 @@ const CardStatusComponent: React.FC<CardStatusProps> = ({
           cornerSmoothing: 1,
           cornerRadius: 20,
           fillColor: '#ECECEC',
-        }}
-      >
+        }}>
         <View style={styles.contentContainer as ViewStyle}>
           <View style={styles.headerContainer as ViewStyle}>
             <View style={styles.titleContainer as ViewStyle}>
               <SvgXml xml={iconSvg} width={24} height={24} />
               <Text style={styles.title as TextStyle}>{title}</Text>
             </View>
-            
+
             <Text style={styles.description as TextStyle}>{description}</Text>
           </View>
-          
+
           <View style={styles.buttonContainer as ViewStyle}>
-            <Button 
-              title={secondaryButtonTitle} 
+            <Button
+              title={secondaryButtonTitle}
               variant="secondary"
               style={styles.button as ViewStyle}
               onPress={onSecondaryButtonPress}
             />
-            <Button 
-              title={primaryButtonTitle} 
+            <Button
+              title={primaryButtonTitle}
               variant="primary"
               style={styles.button as ViewStyle}
               onPress={handlePrimaryButtonPress}
@@ -164,4 +158,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CardStatusComponent; 
+export default CardStatusComponent;

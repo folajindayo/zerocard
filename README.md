@@ -22,4 +22,4 @@ To create a production-ready build of the app (e.g., for submitting to app store
 eas build --profile production
 ```
 
-This command uses Expo Application Services (EAS) to build an optimized standalone app package. 
+This command uses Expo Application Services (EAS) to build an optimized standalone app package.

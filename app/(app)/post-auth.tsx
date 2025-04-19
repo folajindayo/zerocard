@@ -5,13 +5,13 @@ import { useEffect } from 'react';
 
 export default function PostAuthScreen() {
   const router = useRouter();
-  
+
   // Auto-navigate to add-money screen after authentication
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push('/(tab)/home');
     }, 2000); // 2 seconds delay
-    
+
     return () => clearTimeout(timer);
   }, [router]); // Added router to dependency array
 
@@ -57,4 +57,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#000000',
   },
-}); 
+});

@@ -18,10 +18,10 @@ const BetaToast: React.FC<BetaToastProps> = ({ visible = true, onDismiss }) => {
   // Animation values
   const translateY = useRef(new Animated.Value(-100)).current;
   const opacity = useRef(new Animated.Value(0)).current;
-  
+
   // Window dimensions for positioning
   const { width } = Dimensions.get('window');
-  
+
   // Function to animate the toast in
   const animateIn = () => {
     Animated.parallel([
@@ -37,7 +37,7 @@ const BetaToast: React.FC<BetaToastProps> = ({ visible = true, onDismiss }) => {
       }),
     ]).start();
   };
-  
+
   // Function to animate the toast out
   const animateOut = (callback?: () => void) => {
     Animated.parallel([
@@ -55,57 +55,57 @@ const BetaToast: React.FC<BetaToastProps> = ({ visible = true, onDismiss }) => {
       if (callback) callback();
     });
   };
-  
+
   // Set up timer for auto-dismissing toast after 5 seconds
   useEffect(() => {
     if (visible) {
       animateIn();
-      
+
       // Trigger medium impact haptic
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      
+
       // Set a timer to dismiss after 5 seconds
       const timer = setTimeout(() => {
         animateOut(() => {
           if (onDismiss) onDismiss();
         });
       }, 5000);
-      
+
       return () => clearTimeout(timer);
     } else {
       animateOut();
     }
   }, [visible]);
-  
+
   // Don't render anything if not visible
   if (!visible) return null;
-  
+
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.container,
         {
           transform: [{ translateY }],
           opacity,
           width: width - 40, // 20px margin on each side
-          top: 60 // Position from top
+          top: 60, // Position from top
         },
-      ]}
-    >
+      ]}>
       <SquircleView
         style={styles.content}
         squircleParams={{
           cornerSmoothing: 1, // 100% corner smoothing
           cornerRadius: 20,
           fillColor: '#ECECEC',
-        }}
-      >
+        }}>
         <SvgXml xml={betaIconSvg} width={24} height={24} />
-        
+
         <View style={styles.textContainer}>
           <Text style={styles.title}>Beta mode</Text>
           <Text style={styles.message}>
-            We advice to load between the range of <Text style={styles.highlightedText}>1 USDC</Text> to <Text style={styles.highlightedText}>100 USDC</Text>
+            We advice to load between the range of{' '}
+            <Text style={styles.highlightedText}>1 USDC</Text> to{' '}
+            <Text style={styles.highlightedText}>100 USDC</Text>
           </Text>
         </View>
       </SquircleView>
@@ -156,4 +156,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BetaToast; 
+export default BetaToast;

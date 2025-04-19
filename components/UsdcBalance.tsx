@@ -75,4 +75,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UsdcBalance; 
+export default UsdcBalance;

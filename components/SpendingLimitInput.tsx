@@ -1,5 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, UIManager, Platform, Animated, Pressable, Easing } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  LayoutAnimation,
+  UIManager,
+  Platform,
+  Animated,
+  Pressable,
+  Easing,
+} from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { Button } from './Button';
@@ -38,27 +49,27 @@ interface AnimatedDigit {
 }
 
 // Animated digit component with slide-in/out animations
-const AnimatedDigit = ({ digit, isStatic = false }: { digit: AnimatedDigit, isStatic?: boolean }) => {
+const AnimatedDigit = ({
+  digit,
+  isStatic = false,
+}: {
+  digit: AnimatedDigit;
+  isStatic?: boolean;
+}) => {
   // If static (commas, decimals), just show the value without animation
   if (isStatic) {
-    return (
-      <Text style={styles.amountDisplay}>{digit.value}</Text>
-    );
+    return <Text style={styles.amountDisplay}>{digit.value}</Text>;
   }
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.digitWrapper,
-        { 
+        {
           opacity: digit.opacity,
-          transform: [
-            { translateY: digit.translateY },
-            { translateX: digit.translateX }
-          ]
-        }
-      ]}
-    >
+          transform: [{ translateY: digit.translateY }, { translateX: digit.translateX }],
+        },
+      ]}>
       <Text style={styles.amountDisplay}>{digit.value}</Text>
     </Animated.View>
   );
@@ -75,21 +86,23 @@ export default function SpendingLimitInput({
   const prevAmountRef = useRef(amountString);
   const shakeAnimation = useRef(new Animated.Value(0)).current;
   const isRemovingDigit = useRef(false);
-  
+
   // Format with commas but preserve decimal
   const formattedDisplay = formatWithCommas(amountString);
-  
+
   // Define naira conversion rate (1 USDC = X Naira)
   const nairaConversionRate = 1450; // Example rate, should be updated with actual rate
-  
+
   // Calculate naira equivalent
   const nairaEquivalent = parseFloat(amountString) * nairaConversionRate;
-  const formattedNaira = isNaN(nairaEquivalent) ? '~ ₦0.00' : `~ ₦${nairaEquivalent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  
+  const formattedNaira = isNaN(nairaEquivalent)
+    ? '~ ₦0.00'
+    : `~ ₦${nairaEquivalent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
   function formatWithCommas(value: string): string {
     // Handle zero case specifically
     if (value === '0') return '0';
-    
+
     // If it has a decimal
     if (value.includes('.')) {
       const [intPart, decimalPart] = value.split('.');
@@ -99,8 +112,8 @@ export default function SpendingLimitInput({
         return `${formattedIntPart}.${decimalPart}`;
       }
       return `${intPart}.${decimalPart}`;
-    } 
-    
+    }
+
     // No decimal - only use commas for numbers with more than 3 digits
     if (value.length > 3) {
       return Number(value).toLocaleString('en-US');
@@ -113,7 +126,7 @@ export default function SpendingLimitInput({
     const oldDigits = [...animatedDigits];
     const newFormattedDigits = formattedDisplay.split('');
     const newAnimatedDigits: AnimatedDigit[] = [];
-    
+
     // Start with one animated digit for "0" if we have none
     if (oldDigits.length === 0) {
       newAnimatedDigits.push({
@@ -123,7 +136,7 @@ export default function SpendingLimitInput({
         opacity: new Animated.Value(1),
         translateY: new Animated.Value(0),
         translateX: new Animated.Value(0),
-        isNew: false
+        isNew: false,
       });
       setAnimatedDigits(newAnimatedDigits);
       return;
@@ -131,13 +144,13 @@ export default function SpendingLimitInput({
 
     // If going from 0 to something else, or from something to 0
     if (
-      (prevAmountRef.current === '0' && amountString !== '0') || 
+      (prevAmountRef.current === '0' && amountString !== '0') ||
       (prevAmountRef.current !== '0' && amountString === '0')
     ) {
       // If we're transitioning to zero
       if (amountString === '0') {
         // Animate all current digits out to the left
-        oldDigits.forEach(digit => {
+        oldDigits.forEach((digit) => {
           Animated.parallel([
             Animated.spring(digit.translateX, {
               toValue: -50,
@@ -149,7 +162,7 @@ export default function SpendingLimitInput({
               toValue: 0,
               duration: 300,
               useNativeDriver: true,
-            })
+            }),
           ]).start();
         });
 
@@ -157,7 +170,7 @@ export default function SpendingLimitInput({
         const opacity = new Animated.Value(0);
         const translateY = new Animated.Value(30);
         const translateX = new Animated.Value(0);
-        
+
         const zeroDigit = {
           value: '0',
           key: `0-${Date.now()}`,
@@ -165,9 +178,9 @@ export default function SpendingLimitInput({
           opacity,
           translateY,
           translateX,
-          isNew: true
+          isNew: true,
         };
-        
+
         // Animate the new zero in from bottom
         Animated.parallel([
           Animated.spring(translateY, {
@@ -180,17 +193,17 @@ export default function SpendingLimitInput({
             toValue: 1,
             duration: 300,
             useNativeDriver: true,
-          })
+          }),
         ]).start();
 
         setTimeout(() => {
           setAnimatedDigits([zeroDigit]);
         }, 100);
-        
+
         prevAmountRef.current = amountString;
         return;
       }
-      
+
       // If we're transitioning from zero to another number
       // Animate zero out to the left
       if (oldDigits.length > 0) {
@@ -206,17 +219,17 @@ export default function SpendingLimitInput({
             toValue: 0,
             duration: 300,
             useNativeDriver: true,
-          })
+          }),
         ]).start();
       }
-      
+
       // Create new digits with slide-in animation
       const freshDigits = newFormattedDigits.map((char, index) => {
         const isStatic = char === '.' || char === ',';
         const opacity = new Animated.Value(isStatic ? 1 : 0);
         const translateY = new Animated.Value(isStatic ? 0 : 30);
         const translateX = new Animated.Value(0);
-        
+
         // Only animate non-static characters
         if (!isStatic) {
           // Animate in from bottom with delay based on position
@@ -233,10 +246,10 @@ export default function SpendingLimitInput({
               duration: 300,
               delay: index * 50,
               useNativeDriver: true,
-            })
+            }),
           ]).start();
         }
-        
+
         return {
           value: char,
           key: `digit-${index}-${char}-${Date.now()}`,
@@ -244,14 +257,14 @@ export default function SpendingLimitInput({
           opacity,
           translateY,
           translateX,
-          isNew: true
+          isNew: true,
         };
       });
-      
+
       setTimeout(() => {
         setAnimatedDigits(freshDigits);
       }, 100);
-      
+
       prevAmountRef.current = amountString;
       return;
     }
@@ -259,19 +272,21 @@ export default function SpendingLimitInput({
     // Handle digit removal (backspace)
     if (isRemovingDigit.current) {
       isRemovingDigit.current = false;
-      
+
       if (newFormattedDigits.length < oldDigits.length) {
         // Keep track of which oldDigit indexes we've used
         const usedOldIndexes = new Set<number>();
-        
+
         // First, add all digits that remain unchanged
         newFormattedDigits.forEach((char, index) => {
           // Find matching old digit (preferably at the same index)
           let oldIndex = index;
-          
+
           // If this is a static character or the value matches, use the old digit
-          if (index < oldDigits.length && 
-             (char === oldDigits[index].value || char === '.' || char === ',')) {
+          if (
+            index < oldDigits.length &&
+            (char === oldDigits[index].value || char === '.' || char === ',')
+          ) {
             newAnimatedDigits.push(oldDigits[index]);
             usedOldIndexes.add(index);
           } else {
@@ -279,7 +294,7 @@ export default function SpendingLimitInput({
             const opacity = new Animated.Value(1);
             const translateY = new Animated.Value(0);
             const translateX = new Animated.Value(0);
-            
+
             newAnimatedDigits.push({
               value: char,
               key: `digit-${index}-${char}-${Date.now()}`,
@@ -287,16 +302,16 @@ export default function SpendingLimitInput({
               opacity,
               translateY,
               translateX,
-              isNew: false
+              isNew: false,
             });
           }
         });
-        
+
         // Now animate out the digits that were removed
         for (let i = 0; i < oldDigits.length; i++) {
           if (!usedOldIndexes.has(i) && i >= newFormattedDigits.length) {
             const removedDigit = oldDigits[i];
-            
+
             // Animate out to the left
             Animated.parallel([
               Animated.spring(removedDigit.translateX, {
@@ -309,23 +324,23 @@ export default function SpendingLimitInput({
                 toValue: 0,
                 duration: 300,
                 useNativeDriver: true,
-              })
+              }),
             ]).start();
           }
         }
-        
+
         setAnimatedDigits(newAnimatedDigits);
         prevAmountRef.current = amountString;
         return;
       }
     }
-    
+
     // Handle normal case where we're adding digits
     if (newFormattedDigits.length >= oldDigits.length) {
       // Adding digits or same length but different values
       newFormattedDigits.forEach((char, index) => {
         const isStatic = char === '.' || char === ',';
-        
+
         // If we have an existing digit at this position
         if (index < oldDigits.length) {
           // If the digit is the same, keep it
@@ -336,7 +351,7 @@ export default function SpendingLimitInput({
             const opacity = new Animated.Value(1);
             const translateY = new Animated.Value(0);
             const translateX = new Animated.Value(0);
-            
+
             newAnimatedDigits.push({
               value: char,
               key: `digit-${index}-${char}-${Date.now()}`,
@@ -344,7 +359,7 @@ export default function SpendingLimitInput({
               opacity,
               translateY,
               translateX,
-              isNew: false
+              isNew: false,
             });
           }
         } else {
@@ -352,7 +367,7 @@ export default function SpendingLimitInput({
           const opacity = new Animated.Value(isStatic ? 1 : 0);
           const translateY = new Animated.Value(isStatic ? 0 : 30);
           const translateX = new Animated.Value(0);
-          
+
           // Only animate if it's not a static character
           if (!isStatic) {
             Animated.parallel([
@@ -366,10 +381,10 @@ export default function SpendingLimitInput({
                 toValue: 1,
                 duration: 300,
                 useNativeDriver: true,
-              })
+              }),
             ]).start();
           }
-          
+
           newAnimatedDigits.push({
             value: char,
             key: `digit-${index}-${char}-${Date.now()}`,
@@ -377,14 +392,14 @@ export default function SpendingLimitInput({
             opacity,
             translateY,
             translateX,
-            isNew: true
+            isNew: true,
           });
         }
       });
-      
+
       setAnimatedDigits(newAnimatedDigits);
     }
-    
+
     prevAmountRef.current = amountString;
   }, [formattedDisplay]);
 
@@ -397,47 +412,47 @@ export default function SpendingLimitInput({
   const shakeDisplay = () => {
     // Reset the animation value
     shakeAnimation.setValue(0);
-    
+
     // Create a sequence of small, quick movements
     Animated.sequence([
-      Animated.timing(shakeAnimation, { 
-        toValue: 10, 
-        duration: 50, 
-        useNativeDriver: true 
+      Animated.timing(shakeAnimation, {
+        toValue: 10,
+        duration: 50,
+        useNativeDriver: true,
       }),
-      Animated.timing(shakeAnimation, { 
-        toValue: -10, 
-        duration: 50, 
-        useNativeDriver: true 
+      Animated.timing(shakeAnimation, {
+        toValue: -10,
+        duration: 50,
+        useNativeDriver: true,
       }),
-      Animated.timing(shakeAnimation, { 
-        toValue: 10, 
-        duration: 50, 
-        useNativeDriver: true 
+      Animated.timing(shakeAnimation, {
+        toValue: 10,
+        duration: 50,
+        useNativeDriver: true,
       }),
-      Animated.timing(shakeAnimation, { 
-        toValue: -10, 
-        duration: 50, 
-        useNativeDriver: true 
+      Animated.timing(shakeAnimation, {
+        toValue: -10,
+        duration: 50,
+        useNativeDriver: true,
       }),
-      Animated.timing(shakeAnimation, { 
-        toValue: 5, 
-        duration: 50, 
-        useNativeDriver: true 
+      Animated.timing(shakeAnimation, {
+        toValue: 5,
+        duration: 50,
+        useNativeDriver: true,
       }),
-      Animated.timing(shakeAnimation, { 
-        toValue: 0, 
-        duration: 50, 
-        useNativeDriver: true 
-      })
+      Animated.timing(shakeAnimation, {
+        toValue: 0,
+        duration: 50,
+        useNativeDriver: true,
+      }),
     ]).start();
   };
 
   const handleKeyPress = (key: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    
+
     let newAmountString;
-    
+
     if (key === '.' && amountString.includes('.')) return; // Allow only one decimal point
     if (key === '.' && amountString === '0') {
       newAmountString = '0.';
@@ -450,7 +465,8 @@ export default function SpendingLimitInput({
     // Check for decimal places
     if (newAmountString.includes('.')) {
       const parts = newAmountString.split('.');
-      if (parts[1].length > 2) { // Limit to 2 decimal places
+      if (parts[1].length > 2) {
+        // Limit to 2 decimal places
         newAmountString = `${parts[0]}.${parts[1].substring(0, 2)}`;
       }
     }
@@ -461,19 +477,19 @@ export default function SpendingLimitInput({
       // Shake the amount display when exceeding balance
       shakeDisplay();
     }
-    
+
     setAmountString(newAmountString);
   };
 
   const handleBackspace = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    
+
     // If amount is just '0', nothing to do
     if (amountString === '0') return;
-    
+
     // Set flag to indicate we're removing a digit
     isRemovingDigit.current = true;
-    
+
     // Simple backspace functionality
     if (amountString.length > 1) {
       setAmountString((prev) => prev.slice(0, -1));
@@ -485,9 +501,9 @@ export default function SpendingLimitInput({
   // Long-press handler for backspace to clear all
   const handleLongPressBackspace = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    
+
     if (amountString === '0') return;
-    
+
     // Clear all digits
     setAmountString('0');
   };
@@ -510,7 +526,7 @@ export default function SpendingLimitInput({
       shakeDisplay();
       return;
     }
-    
+
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const limitValue = parseFloat(amountString) || 0;
     if (limitValue > 0) {
@@ -524,7 +540,7 @@ export default function SpendingLimitInput({
   // Button animation
   const createKeyAnimation = () => {
     const scale = new Animated.Value(1);
-    
+
     const onPressIn = () => {
       Animated.spring(scale, {
         toValue: 1.2,
@@ -533,7 +549,7 @@ export default function SpendingLimitInput({
         useNativeDriver: true,
       }).start();
     };
-    
+
     const onPressOut = () => {
       Animated.spring(scale, {
         toValue: 1,
@@ -542,7 +558,7 @@ export default function SpendingLimitInput({
         useNativeDriver: true,
       }).start();
     };
-    
+
     return { scale, onPressIn, onPressOut };
   };
 
@@ -557,35 +573,24 @@ export default function SpendingLimitInput({
           </View>
         </View>
       </View>
-      
-      <Animated.View 
-        style={[
-          styles.amountDisplayContainer,
-          { transform: [{ translateX: shakeAnimation }] }
-        ]}
-      >
+
+      <Animated.View
+        style={[styles.amountDisplayContainer, { transform: [{ translateX: shakeAnimation }] }]}>
         <View style={styles.digitContainer}>
           {animatedDigits.map((digit, index) => (
-            <AnimatedDigit 
-              key={digit.key} 
-              digit={digit} 
-              isStatic={digit.value === '.' || digit.value === ','} 
+            <AnimatedDigit
+              key={digit.key}
+              digit={digit}
+              isStatic={digit.value === '.' || digit.value === ','}
             />
           ))}
           {animatedDigits.length === 0 && (
-            <Text 
-              style={[
-                styles.amountDisplay,
-                isZero ? styles.amountDisplayEmpty : null
-              ]}
-            >
-              0
-            </Text>
+            <Text style={[styles.amountDisplay, isZero ? styles.amountDisplayEmpty : null]}>0</Text>
           )}
         </View>
         <Text style={styles.nairaEquivalent}>{formattedNaira}</Text>
       </Animated.View>
-      
+
       <View style={styles.percentageButtonsContainer}>
         <TouchableOpacity style={styles.percentageButton} onPress={() => handleSetPercentage(20)}>
           <Text style={styles.percentageButtonText}>20%</Text>
@@ -597,26 +602,27 @@ export default function SpendingLimitInput({
           <Text style={styles.percentageButtonText}>Max</Text>
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.keyboardContainer}>
-        {[['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['.', '0', 'back']].map((row, rowIndex) => (
+        {[
+          ['1', '2', '3'],
+          ['4', '5', '6'],
+          ['7', '8', '9'],
+          ['.', '0', 'back'],
+        ].map((row, rowIndex) => (
           <View key={rowIndex} style={styles.keyboardRow}>
             {row.map((key) => {
               const keyAnim = createKeyAnimation();
-              
+
               return (
                 <Pressable
                   key={key}
-                  style={[
-                    styles.keyboardButton,
-                    key === 'back' ? styles.backspaceButton : null
-                  ]}
+                  style={[styles.keyboardButton, key === 'back' ? styles.backspaceButton : null]}
                   onPressIn={keyAnim.onPressIn}
                   onPressOut={keyAnim.onPressOut}
                   onPress={() => (key === 'back' ? handleBackspace() : handleKeyPress(key))}
                   onLongPress={key === 'back' ? handleLongPressBackspace : undefined}
-                  delayLongPress={500}
-                >
+                  delayLongPress={500}>
                   <Animated.View style={{ transform: [{ scale: keyAnim.scale }] }}>
                     {key === 'back' ? (
                       <SvgXml xml={backArrowIconSvg} width={24} height={24} />
@@ -630,11 +636,11 @@ export default function SpendingLimitInput({
           </View>
         ))}
       </View>
-      
-      <Button 
-        title="Set Limit" 
-        onPress={handleSetLimit} 
-        style={styles.setLimitButton} 
+
+      <Button
+        title="Set Limit"
+        onPress={handleSetLimit}
+        style={styles.setLimitButton}
         disabled={isZero || isExceedingBalance}
       />
     </View>
@@ -790,4 +796,4 @@ const styles = StyleSheet.create({
     marginTop: 36, // Push button to the bottom
     width: '100%', // Take full width
   },
-}); 
+});

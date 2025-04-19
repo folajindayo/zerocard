@@ -9,11 +9,11 @@ interface LottieAnimationProps {
   loop?: boolean;
 }
 
-export const LottieAnimation = ({ 
-  source, 
-  size = 150, 
-  autoPlay = true, 
-  loop = true 
+export const LottieAnimation = ({
+  source,
+  size = 150,
+  autoPlay = true,
+  loop = true,
 }: LottieAnimationProps) => {
   return (
     <View style={styles.container}>
@@ -37,4 +37,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LottieAnimation; 
+export default LottieAnimation;

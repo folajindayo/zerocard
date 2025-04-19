@@ -11,12 +11,12 @@ const AnimationExamples: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Animation Examples</Text>
-      
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Basic Lottie Animation</Text>
-        <LottieAnimation 
-          source="https://lottie.host/ba1c24cb-50de-47c1-8781-d609401ac8df/qn48q8KwW9.lottie" 
-          size={100} 
+        <LottieAnimation
+          source="https://lottie.host/ba1c24cb-50de-47c1-8781-d609401ac8df/qn48q8KwW9.lottie"
+          size={100}
         />
       </View>
 
@@ -32,9 +32,9 @@ const AnimationExamples: React.FC = () => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Custom Sized Animation</Text>
-        <LottieAnimation 
-          source="https://lottie.host/ba1c24cb-50de-47c1-8781-d609401ac8df/qn48q8KwW9.lottie" 
-          size={80} 
+        <LottieAnimation
+          source="https://lottie.host/ba1c24cb-50de-47c1-8781-d609401ac8df/qn48q8KwW9.lottie"
+          size={80}
         />
       </View>
     </View>
@@ -65,4 +65,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AnimationExamples; 
+export default AnimationExamples;

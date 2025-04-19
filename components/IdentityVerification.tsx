@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   TextInput,
   Animated,
   Easing,
@@ -11,7 +11,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
@@ -63,10 +63,7 @@ interface IdentityVerificationProps {
   onVerify: (idType: string, idNumber: string) => void;
 }
 
-const IdentityVerification: React.FC<IdentityVerificationProps> = ({
-  onClose,
-  onVerify
-}) => {
+const IdentityVerification: React.FC<IdentityVerificationProps> = ({ onClose, onVerify }) => {
   const [selectedIdentity, setSelectedIdentity] = useState<string>('');
   const [identityNumber, setIdentityNumber] = useState<string>('');
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -79,20 +76,20 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
   const [otpVerified, setOtpVerified] = useState<boolean>(false);
   const [userName, setUserName] = useState<string>('');
   const [isBiometricLoading, setIsBiometricLoading] = useState<boolean>(false);
-  
+
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
   const shakeAnimation = useRef(new Animated.Value(0)).current;
   const otpShakeAnimation = useRef(new Animated.Value(0)).current;
-  
+
   // Simulate verification process
   useEffect(() => {
     if (identityNumber.length === 11 && !isLoading && !isError && !identityVerified) {
       setIsLoading(true);
-      
+
       // Simulate API call with a delay
       const timerId = setTimeout(() => {
         setIsLoading(false);
-        
+
         // For demo purposes, let's say numbers ending with "0" are invalid
         if (identityNumber.endsWith('0')) {
           setIsError(true);
@@ -104,20 +101,20 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }, 2000);
-      
+
       return () => clearTimeout(timerId);
     }
   }, [identityNumber]);
-  
+
   // Simulate OTP verification process
   useEffect(() => {
     if (otpCode.length === 6 && !isLoadingOtp && !isOtpError && !otpVerified && identityVerified) {
       setIsLoadingOtp(true);
-      
+
       // Simulate API call with a delay
       const timerId = setTimeout(() => {
         setIsLoadingOtp(false);
-        
+
         // For demo purposes, let's say OTP "123456" is invalid
         if (otpCode === '123456') {
           setIsOtpError(true);
@@ -130,18 +127,18 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }, 2000);
-      
+
       return () => clearTimeout(timerId);
     }
   }, [otpCode]);
-  
+
   // Reset verification state when identity type changes
   useEffect(() => {
     if (selectedIdentity) {
       resetVerificationState();
     }
   }, [selectedIdentity]);
-  
+
   const resetVerificationState = () => {
     setIdentityNumber('');
     setIsError(false);
@@ -152,7 +149,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
     setUserName('');
     setIsBiometricLoading(false);
   };
-  
+
   const shakeField = (animation: Animated.Value) => {
     animation.setValue(0);
     Animated.sequence([
@@ -175,10 +172,10 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         toValue: 0,
         duration: 100,
         useNativeDriver: true,
-      })
+      }),
     ]).start();
   };
-  
+
   const toggleDropdown = () => {
     if (showDropdown) {
       // Hide dropdown
@@ -200,61 +197,61 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
-  
+
   const selectIdentityType = (type: string) => {
     setSelectedIdentity(type);
     toggleDropdown();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
-  
+
   const handleIdentityNumberChange = (text: string) => {
     // Reset error state when user starts typing again
     if (isError) {
       setIsError(false);
     }
-    
+
     // Only accept numbers
     const numericText = text.replace(/[^0-9]/g, '');
-    
+
     // Check if trying to enter more than 11 digits
     if (numericText.length > 11) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
-    
+
     setIdentityNumber(numericText);
   };
-  
+
   const handleOtpChange = (text: string) => {
     // Reset error state when user starts typing again
     if (isOtpError) {
       setIsOtpError(false);
     }
-    
+
     // Only accept numbers
     const numericText = text.replace(/[^0-9]/g, '');
-    
+
     // Check if trying to enter more than 6 digits
     if (numericText.length > 6) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
-    
+
     setOtpCode(numericText);
   };
-  
+
   const retryIdentityVerification = () => {
     setIsError(false);
     setIdentityNumber('');
   };
-  
+
   const retryOtpVerification = () => {
     setIsOtpError(false);
     setOtpCode('');
   };
-  
+
   const isFormValid = selectedIdentity && otpVerified;
-  
+
   const handleVerify = async () => {
     if (!isFormValid || isBiometricLoading) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -272,10 +269,10 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         onVerify(selectedIdentity, identityNumber);
         // Navigate to the dedicated order-confirmation screen
         router.replace({
-          pathname: "/(tab)/home/order-confirmation",
-          params: { 
-            identity: selectedIdentity 
-          }
+          pathname: '/(tab)/home/order-confirmation',
+          params: {
+            identity: selectedIdentity,
+          },
         });
         return;
       }
@@ -285,7 +282,10 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
       if (!hasHardware || !isEnrolled) {
-        Alert.alert('Biometric Error', 'Biometric authentication is not available or not enrolled on this device.');
+        Alert.alert(
+          'Biometric Error',
+          'Biometric authentication is not available or not enrolled on this device.'
+        );
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         setIsBiometricLoading(false);
         return;
@@ -301,13 +301,18 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         onVerify(selectedIdentity, identityNumber);
         // Navigate to the dedicated order-confirmation screen
         router.replace({
-          pathname: "/(tab)/home/order-confirmation",
-          params: { 
-            identity: selectedIdentity 
-          }
+          pathname: '/(tab)/home/order-confirmation',
+          params: {
+            identity: selectedIdentity,
+          },
         });
       } else {
-        Alert.alert('Authentication Failed', result.error === 'user_cancel' ? 'Authentication cancelled.' : 'Biometric authentication failed.');
+        Alert.alert(
+          'Authentication Failed',
+          result.error === 'user_cancel'
+            ? 'Authentication cancelled.'
+            : 'Biometric authentication failed.'
+        );
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
     } catch (error) {
@@ -318,34 +323,28 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
       setIsBiometricLoading(false);
     }
   };
-  
+
   // Format phone number for display
   const formatPhoneNumber = (number: string) => {
     if (!number || number.length < 11) return '';
     const lastThreeDigits = number.substring(number.length - 3);
     return `xxx xxx xxx ${lastThreeDigits}`;
   };
-  
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
       style={[styles.container, { backgroundColor: '#1F1F1F' }]}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
-    >
-      <ScrollView 
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
+      <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
         {/* Back Button */}
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={onClose}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={onClose} activeOpacity={0.7}>
           <SvgXml xml={backArrowSvg} width={24} height={24} />
         </TouchableOpacity>
-      
+
         <View style={styles.titleContainer}>
           <View style={styles.titleContent}>
             <Text style={styles.title}>Can we verify your{'\n'}identity? 🔎</Text>
@@ -355,43 +354,30 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
             <SvgXml xml={closeIconSvg} width={24} height={24} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.formContainer}>
           {/* Identity Type Selector */}
-          <TouchableOpacity 
-            style={styles.textField} 
+          <TouchableOpacity
+            style={styles.textField}
             onPress={otpVerified ? undefined : toggleDropdown}
-            activeOpacity={otpVerified ? 1 : 0.8}
-          >
+            activeOpacity={otpVerified ? 1 : 0.8}>
             <View style={styles.textFieldContent}>
-              <Text style={[
-                styles.placeholderText,
-                selectedIdentity ? styles.selectedText : null
-              ]}>
-                {selectedIdentity || "Select identity"}
+              <Text style={[styles.placeholderText, selectedIdentity ? styles.selectedText : null]}>
+                {selectedIdentity || 'Select identity'}
               </Text>
               {!otpVerified && <SvgXml xml={arrowDownSvg} width={16} height={16} />}
             </View>
           </TouchableOpacity>
-          
+
           {/* Identity Number Input */}
-          <Animated.View 
-            style={[
-              styles.textField,
-              { transform: [{ translateX: shakeAnimation }] }
-            ]}
-          >
+          <Animated.View
+            style={[styles.textField, { transform: [{ translateX: shakeAnimation }] }]}>
             <View style={styles.textFieldContent}>
               {otpVerified ? (
-                <Text style={styles.selectedText}>
-                  {formatPhoneNumber(identityNumber)}
-                </Text>
+                <Text style={styles.selectedText}>{formatPhoneNumber(identityNumber)}</Text>
               ) : (
                 <TextInput
-                  style={[
-                    styles.input,
-                    isError && styles.errorText
-                  ]}
+                  style={[styles.input, isError && styles.errorText]}
                   placeholder="Enter identity number"
                   placeholderTextColor="#9A9A9A"
                   value={identityNumber}
@@ -401,29 +387,21 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                   editable={!isLoading && !identityVerified}
                 />
               )}
-              {isLoading && (
-                <LoadingSpinner size="small" color="#ffffff" />
-              )}
-              {otpVerified && (
-                <SvgXml xml={tickCircleIconSvg} width={16} height={16} />
-              )}
+              {isLoading && <LoadingSpinner size="small" color="#ffffff" />}
+              {otpVerified && <SvgXml xml={tickCircleIconSvg} width={16} height={16} />}
             </View>
           </Animated.View>
-          
+
           {/* OTP Input Field - Only show after identity is verified and before OTP is verified */}
           {identityVerified && !otpVerified && (
-            <Animated.View 
-              style={[
-                styles.textField,
-                { transform: [{ translateX: otpShakeAnimation }] }
-              ]}
-            >
+            <Animated.View
+              style={[styles.textField, { transform: [{ translateX: otpShakeAnimation }] }]}>
               <View style={styles.textFieldContent}>
                 <TextInput
                   style={[
                     styles.input,
                     isOtpError && styles.errorText,
-                    otpCode && styles.selectedText
+                    otpCode && styles.selectedText,
                   ]}
                   placeholder="Enter OTP"
                   placeholderTextColor="#9A9A9A"
@@ -433,82 +411,51 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                   maxLength={6}
                   editable={!isLoadingOtp}
                 />
-                {isLoadingOtp && (
-                  <LoadingSpinner size="small" color="#ffffff" />
-                )}
+                {isLoadingOtp && <LoadingSpinner size="small" color="#ffffff" />}
               </View>
             </Animated.View>
           )}
-          
+
           {/* Error or Info Messages */}
           {isError ? (
-            <TouchableOpacity 
-              style={styles.errorContainer}
-              onPress={retryIdentityVerification}
-            >
-              <SvgXml
-                xml={retryIconSvg}
-                width={14}
-                height={14}
-              />
+            <TouchableOpacity style={styles.errorContainer} onPress={retryIdentityVerification}>
+              <SvgXml xml={retryIconSvg} width={14} height={14} />
               <Text style={styles.errorText}>Invalid identity number</Text>
             </TouchableOpacity>
           ) : isOtpError ? (
-            <TouchableOpacity 
-              style={styles.errorContainer}
-              onPress={retryOtpVerification}
-            >
-              <SvgXml
-                xml={retryIconSvg}
-                width={14}
-                height={14}
-              />
+            <TouchableOpacity style={styles.errorContainer} onPress={retryOtpVerification}>
+              <SvgXml xml={retryIconSvg} width={14} height={14} />
               <Text style={styles.errorText}>Invalid OTP code</Text>
             </TouchableOpacity>
           ) : identityVerified && !otpVerified ? (
             <View style={styles.infoContainer}>
-              <SvgXml
-                xml={smallTickCircleIconSvg}
-                width={14}
-                height={14}
-              />
-              <Text style={styles.infoText}>
-                Code sent to {formatPhoneNumber(identityNumber)}
-              </Text>
+              <SvgXml xml={smallTickCircleIconSvg} width={14} height={14} />
+              <Text style={styles.infoText}>Code sent to {formatPhoneNumber(identityNumber)}</Text>
             </View>
           ) : otpVerified ? (
             <View style={styles.infoContainer}>
-              <Text style={styles.nameText}>
-                {userName}
-              </Text>
+              <Text style={styles.nameText}>{userName}</Text>
             </View>
           ) : (
             <View style={styles.securityContainer}>
-              <SvgXml
-                xml={padlockIconSvg}
-                width={14}
-                height={14}
-                color="#767676"
-              />
+              <SvgXml xml={padlockIconSvg} width={14} height={14} color="#767676" />
               <Text style={styles.securityText}>Protected by end-to-end encryption</Text>
             </View>
           )}
         </View>
-        
+
         {/* Dropdown Menu Modal */}
         <Modal
           visible={showDropdown}
           transparent={true}
           animationType="none"
-          onRequestClose={toggleDropdown}
-        >
+          onRequestClose={toggleDropdown}>
           <View style={styles.dropdownContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.dropdownOverlay}
               activeOpacity={1}
-              onPress={toggleDropdown}
-            >
-              <Animated.View 
+              onPress={toggleDropdown}>
+              <Animated.View
                 style={[
                   styles.dropdownMenu,
                   {
@@ -522,36 +469,33 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
                       },
                     ],
                   },
-                ]}
-              >
-                <TouchableOpacity 
+                ]}>
+                <TouchableOpacity
                   style={styles.dropdownItem}
-                  onPress={() => selectIdentityType('National Identity Number (NIN)')}
-                >
+                  onPress={() => selectIdentityType('National Identity Number (NIN)')}>
                   <Text style={styles.dropdownItemText}>National Identity Number (NIN)</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.dropdownItem}
-                  onPress={() => selectIdentityType('Bank Verification Number (BVN)')}
-                >
+                  onPress={() => selectIdentityType('Bank Verification Number (BVN)')}>
                   <Text style={styles.dropdownItemText}>Bank Verification Number (BVN)</Text>
                 </TouchableOpacity>
               </Animated.View>
             </TouchableOpacity>
           </View>
         </Modal>
-        
+
         {/* Verify Button */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[
               styles.verifyButton,
-              (!isFormValid || isLoading || isLoadingOtp || isBiometricLoading) && styles.verifyButtonDisabled
+              (!isFormValid || isLoading || isLoadingOtp || isBiometricLoading) &&
+                styles.verifyButtonDisabled,
             ]}
             onPress={handleVerify}
             activeOpacity={0.8}
-            disabled={!isFormValid || isLoading || isLoadingOtp || isBiometricLoading}
-          >
+            disabled={!isFormValid || isLoading || isLoadingOtp || isBiometricLoading}>
             {isBiometricLoading ? (
               <LoadingSpinner size="small" color="#000000" />
             ) : (
@@ -806,4 +750,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IdentityVerification; 
+export default IdentityVerification;

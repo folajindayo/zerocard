@@ -8,7 +8,13 @@ import React from 'react';
 // Loading and Error components for AuthBoundary
 function FullScreenLoader() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f7f7f7' }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f7f7f7',
+      }}>
       {/* Activity indicator would go here */}
     </View>
   );
@@ -16,7 +22,14 @@ function FullScreenLoader() {
 
 function ErrorScreen({ error }: { error: Error }) {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f7f7f7', padding: 20 }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f7f7f7',
+        padding: 20,
+      }}>
       <View>
         <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       </View>
@@ -26,19 +39,17 @@ function ErrorScreen({ error }: { error: Error }) {
 
 export default function TabLayout() {
   const pathname = usePathname();
-  
+
   // Check if we should hide the tab bar for certain routes
-  const hideTabBar = pathname.includes('/order-card') || 
-                     pathname.includes('/order-confirmation');
-  
+  const hideTabBar = pathname.includes('/order-card') || pathname.includes('/order-confirmation');
+
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <AuthBoundary
         loading={<FullScreenLoader />}
         error={(error) => <ErrorScreen error={error} />}
-        unauthenticated={<Redirect href="/" />}
-      >
+        unauthenticated={<Redirect href="/" />}>
         <Tabs
           screenOptions={{
             headerShown: false,
@@ -46,16 +57,15 @@ export default function TabLayout() {
             contentStyle: { backgroundColor: '#f7f7f7', paddingHorizontal: 16 },
           }}
           // Use our custom NavigationBar only if not hiding
-          tabBar={hideTabBar ? () => null : () => <NavigationBar />}
-        >
+          tabBar={hideTabBar ? () => null : () => <NavigationBar />}>
           <Tabs.Screen
             name="home"
             options={{
               title: 'Home',
               // This makes home/index.tsx the default for the "home" route
               href: {
-                pathname: "home/index"
-              }
+                pathname: 'home/index',
+              },
             }}
           />
           <Tabs.Screen

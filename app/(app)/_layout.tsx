@@ -30,14 +30,12 @@ export default function AppLayout() {
       <AuthBoundary
         loading={<FullScreenLoader />}
         error={(error) => <ErrorScreen error={error} />}
-        unauthenticated={<Redirect href="/" />}
-      >
+        unauthenticated={<Redirect href="/" />}>
         <Stack
           screenOptions={{
             headerShown: false,
             contentStyle: { backgroundColor: '#f7f7f7', paddingHorizontal: 16 },
-          }}
-        >
+          }}>
           <Stack.Screen
             name="add-money"
             options={{
@@ -54,9 +52,19 @@ export default function AppLayout() {
             name="spending-limit"
             options={{
               title: 'Spending Limit',
-              contentStyle: { 
-                backgroundColor: '#1f1f1f', 
-                paddingHorizontal: 16 
+              contentStyle: {
+                backgroundColor: '#1f1f1f',
+                paddingHorizontal: 16,
+              },
+            }}
+          />
+          <Stack.Screen
+            name="card-activation"
+            options={{
+              title: 'Card Activation',
+              contentStyle: {
+                backgroundColor: '#FAFAFA',
+                paddingHorizontal: 0,
               },
             }}
           />

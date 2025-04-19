@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  StyleSheet,
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { useFonts } from 'expo-font';
@@ -51,37 +51,29 @@ const NameInput: React.FC<NameInputProps> = ({ onClose, onBack, onContinue }) =>
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView 
+      style={styles.container}>
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
         {onBack && (
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={onBack}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
             <SvgXml xml={backArrowIconSvg} width={24} height={24} />
           </TouchableOpacity>
         )}
-        
+
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <Text style={styles.titleText}>
-              What's your real{'\n'}name 🙈
-            </Text>
+            <Text style={styles.titleText}>What's your real{'\n'}name 🙈</Text>
             <Text style={styles.descriptionText}>
               We want to know you more so we'd know what to call you
             </Text>
           </View>
-          
+
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <SvgXml xml={closeIconSvg} width={24} height={24} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.nameFieldsContainer}>
           {/* First name field */}
           <View style={styles.textFieldContainer}>
@@ -96,7 +88,7 @@ const NameInput: React.FC<NameInputProps> = ({ onClose, onBack, onContinue }) =>
               />
             </View>
           </View>
-          
+
           {/* Last name field */}
           <View style={styles.textFieldContainer}>
             <View style={styles.textField}>
@@ -109,24 +101,18 @@ const NameInput: React.FC<NameInputProps> = ({ onClose, onBack, onContinue }) =>
               />
             </View>
           </View>
-          
+
           {/* Info message */}
           <View style={styles.infoContainer}>
             <SvgXml xml={infoCircleIconSvg} width={14} height={14} />
-            <Text style={styles.infoText}>
-              Enter your full legal name as on your ID
-            </Text>
+            <Text style={styles.infoText}>Enter your full legal name as on your ID</Text>
           </View>
         </View>
-        
-        <TouchableOpacity 
-          style={[
-            styles.continueButton, 
-            !isFormValid && styles.continueButtonDisabled
-          ]}
+
+        <TouchableOpacity
+          style={[styles.continueButton, !isFormValid && styles.continueButtonDisabled]}
           onPress={handleContinue}
-          disabled={!isFormValid}
-        >
+          disabled={!isFormValid}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -255,4 +241,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NameInput; 
+export default NameInput;

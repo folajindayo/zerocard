@@ -73,36 +73,20 @@ const freezeIconSvg = `<svg width="25" height="24" viewBox="0 0 25 24" fill="non
 </defs>
 </svg>`;
 
-const CardControls: React.FC<CardControlsProps> = ({
-  onLoadCard,
-  onWithdraw,
-  onFreezeCard,
-}) => {
+const CardControls: React.FC<CardControlsProps> = ({ onLoadCard, onWithdraw, onFreezeCard }) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.buttonContainer}
-        onPress={onLoadCard}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity style={styles.buttonContainer} onPress={onLoadCard} activeOpacity={0.7}>
         <SvgXml xml={loadCardSvg} width={18} height={18} />
         <Text style={styles.buttonText}>Load card</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={styles.buttonContainer}
-        onPress={onWithdraw}
-        activeOpacity={0.7}
-      >
+
+      <TouchableOpacity style={styles.buttonContainer} onPress={onWithdraw} activeOpacity={0.7}>
         <SvgXml xml={withdrawCardSvg} width={18} height={18} />
         <Text style={styles.buttonText}>Withdraw</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={styles.buttonContainer}
-        onPress={onFreezeCard}
-        activeOpacity={0.7}
-      >
+
+      <TouchableOpacity style={styles.buttonContainer} onPress={onFreezeCard} activeOpacity={0.7}>
         <SvgXml xml={freezeIconSvg} width={16} height={16} />
         <Text style={styles.buttonText}>Freeze card</Text>
       </TouchableOpacity>
@@ -144,4 +128,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CardControls; 
+export default CardControls;

@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  StyleSheet,
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { useFonts } from 'expo-font';
@@ -51,10 +51,15 @@ interface PhoneInputProps {
 
 const PHONE_DRAFT_KEY = 'PHONE_DRAFT_DATA';
 
-const PhoneInput: React.FC<PhoneInputProps> = ({ onClose, onBack, onContinue, userName = 'there' }) => {
+const PhoneInput: React.FC<PhoneInputProps> = ({
+  onClose,
+  onBack,
+  onContinue,
+  userName = 'there',
+}) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [showShippingAddress, setShowShippingAddress] = useState(false);
-  
+
   const phoneInputRef = useRef<TextInput>(null);
 
   // Load saved draft on initial mount
@@ -70,7 +75,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onClose, onBack, onContinue, us
         console.error('Error loading draft:', error);
       }
     };
-    
+
     loadDraft();
   }, []);
 
@@ -78,7 +83,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onClose, onBack, onContinue, us
   const formatPhoneNumber = (text: string) => {
     // Remove all non-digit characters
     const digitsOnly = text.replace(/\D/g, '').slice(0, 11);
-    
+
     if (digitsOnly.length <= 3) {
       return digitsOnly;
     } else if (digitsOnly.length <= 6) {
@@ -99,10 +104,10 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onClose, onBack, onContinue, us
 
   const handleContinue = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    
+
     // Show ShippingAddress component
     setShowShippingAddress(true);
-    
+
     // Pass the raw phone number without formatting to onContinue if provided
     if (onContinue) {
       const rawPhoneNumber = phoneNumber.replace(/\D/g, '');
@@ -143,45 +148,32 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onClose, onBack, onContinue, us
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView 
+      style={styles.container}>
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
         {onBack && (
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={onBack}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
             <SvgXml xml={backArrowIconSvg} width={24} height={24} />
           </TouchableOpacity>
         )}
-        
+
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <Text style={styles.titleText}>
-              What's your phone{'\n'}number?
-            </Text>
-            <Text style={styles.descriptionText}>
-              We promise not to call you.
-            </Text>
+            <Text style={styles.titleText}>What's your phone{'\n'}number?</Text>
+            <Text style={styles.descriptionText}>We promise not to call you.</Text>
           </View>
-          
+
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <SvgXml xml={closeIconSvg} width={24} height={24} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.phoneContainer}>
           <View style={styles.phoneFieldContainer}>
             <TextInput
               ref={phoneInputRef}
-              style={[
-                styles.phoneInput, 
-                phoneNumber && styles.filledInput
-              ]}
+              style={[styles.phoneInput, phoneNumber && styles.filledInput]}
               placeholder="090X XXX XXXX"
               placeholderTextColor="#A2A2A2"
               value={phoneNumber}
@@ -191,18 +183,12 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onClose, onBack, onContinue, us
             />
           </View>
         </View>
-        
-        <TouchableOpacity 
-          style={styles.continueButton}
-          onPress={handleContinue}
-        >
+
+        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.saveDraftButton}
-          onPress={saveDraft}
-        >
+
+        <TouchableOpacity style={styles.saveDraftButton} onPress={saveDraft}>
           <Text style={styles.saveDraftButtonText}>Save draft</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -330,4 +316,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PhoneInput; 
+export default PhoneInput;

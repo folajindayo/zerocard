@@ -9,12 +9,12 @@ import YourRootComponent from './path-to-your-root-component';
 
 export default function App() {
   // Example wallet ID - this would come from your authentication system
-  const walletId = "0xf235c72e61d7339c76f6b36d8d8c0b6h92F";
+  const walletId = '0xf235c72e61d7339c76f6b36d8d8c0b6h92F';
 
   return (
     <SafeAreaProvider>
       <StatusBar style="auto" />
-      
+
       {/* Global modal providers that work across the entire app */}
       <DepositModalProvider walletId={walletId}>
         <UsernameModalProvider>
@@ -23,4 +23,4 @@ export default function App() {
       </DepositModalProvider>
     </SafeAreaProvider>
   );
-} 
+}

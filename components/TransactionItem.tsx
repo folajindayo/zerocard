@@ -79,7 +79,8 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
         <SvgXml xml={withdrawIconSvg} width={36} height={36} />
       </View>
     );
-  } else { // spend
+  } else {
+    // spend
     title = `You spent ${amount} ${currency}`;
     amountText = `-₦${(amount * 1500).toFixed(2)}`;
     amountTagStyle = styles.spendAmountTag;
@@ -95,7 +96,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
       <View style={styles.leftContent}>
         {/* Icon */}
         {iconSvg}
-        
+
         {/* Transaction details */}
         <View style={styles.details}>
           <Text style={styles.title}>{title}</Text>
@@ -105,12 +106,9 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
           </View>
         </View>
       </View>
-      
+
       {/* Amount tag */}
-      <View style={[
-        styles.amountTag,
-        amountTagStyle
-      ]}>
+      <View style={[styles.amountTag, amountTagStyle]}>
         <Text style={styles.amountText}>{amountText}</Text>
       </View>
     </View>
@@ -212,4 +210,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransactionItem; 
+export default TransactionItem;

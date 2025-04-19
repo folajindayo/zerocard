@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Modal, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
   Dimensions,
   Animated,
   Easing,
   TextInput,
   Keyboard,
-  Alert
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SquircleView } from 'react-native-figma-squircle';
@@ -31,13 +31,13 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
   visible,
   onClose,
   onSetUsername,
-  initialUsername = ''
+  initialUsername = '',
 }) => {
   const [username, setUsername] = React.useState(initialUsername);
   const [status, setStatus] = React.useState<ValidationStatus>('empty');
   const [isKeyboardVisible, setKeyboardVisible] = React.useState(false);
   const [hasSetUsername, setHasSetUsername] = React.useState(false);
-  
+
   const opacity = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(100)).current;
   const modalPosition = React.useRef(new Animated.Value(0)).current;
@@ -58,14 +58,14 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
           toValue: 1,
           duration: 300,
           useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
+          easing: Easing.out(Easing.ease),
         }),
         Animated.timing(translateY, {
           toValue: 0,
           duration: 300,
           useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
-        })
+          easing: Easing.out(Easing.ease),
+        }),
       ]).start();
     } else {
       Animated.parallel([
@@ -73,44 +73,38 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
           toValue: 0,
           duration: 200,
           useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
+          easing: Easing.in(Easing.ease),
         }),
         Animated.timing(translateY, {
           toValue: 100,
           duration: 200,
           useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
-        })
+          easing: Easing.in(Easing.ease),
+        }),
       ]).start();
     }
   }, [visible, opacity, translateY]);
 
   // Handle keyboard show/hide
   React.useEffect(() => {
-    const keyboardWillShowListener = Keyboard.addListener(
-      'keyboardWillShow',
-      () => {
-        setKeyboardVisible(true);
-        Animated.timing(modalPosition, {
-          toValue: -150, // Move modal up by 150 pixels
-          duration: 300,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
-        }).start();
-      }
-    );
-    const keyboardWillHideListener = Keyboard.addListener(
-      'keyboardWillHide',
-      () => {
-        setKeyboardVisible(false);
-        Animated.timing(modalPosition, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.ease)
-        }).start();
-      }
-    );
+    const keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', () => {
+      setKeyboardVisible(true);
+      Animated.timing(modalPosition, {
+        toValue: -150, // Move modal up by 150 pixels
+        duration: 300,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }).start();
+    });
+    const keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', () => {
+      setKeyboardVisible(false);
+      Animated.timing(modalPosition, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }).start();
+    });
 
     return () => {
       keyboardWillShowListener.remove();
@@ -150,11 +144,9 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
       Keyboard.dismiss();
       onClose();
     } else {
-      Alert.alert(
-        "Username Required",
-        "Please set a username before continuing.",
-        [{ text: "OK" }]
-      );
+      Alert.alert('Username Required', 'Please set a username before continuing.', [
+        { text: 'OK' },
+      ]);
     }
   };
 
@@ -165,59 +157,40 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
       onClose();
     } else if (status === 'taken') {
       Alert.alert(
-        "Username Not Available",
-        "This username is already taken. Please choose another one.",
-        [{ text: "OK" }]
+        'Username Not Available',
+        'This username is already taken. Please choose another one.',
+        [{ text: 'OK' }]
       );
     } else if (status === 'empty' || username.length === 0) {
-      Alert.alert(
-        "Username Required",
-        "Please enter a username to continue.",
-        [{ text: "OK" }]
-      );
+      Alert.alert('Username Required', 'Please enter a username to continue.', [{ text: 'OK' }]);
     }
   };
 
   return (
-    <Modal
-      transparent
-      visible={visible}
-      animationType="none"
-      onRequestClose={handleClose}
-    >
+    <Modal transparent visible={visible} animationType="none" onRequestClose={handleClose}>
       <BlurBackground visible={visible} intensity={40} tint="dark" />
-      
-      <TouchableOpacity 
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={handleClose}
-      >
-        <Animated.View 
+
+      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleClose}>
+        <Animated.View
           style={[
             styles.modalAnimatedContainer,
             {
               left: (width - 354) / 2, // Center horizontally
               opacity,
-              transform: [
-                { translateY: translateY },
-                { translateY: modalPosition }
-              ]
-            }
-          ]}
-        >
+              transform: [{ translateY: translateY }, { translateY: modalPosition }],
+            },
+          ]}>
           <SquircleView
             style={styles.modalContainer}
             squircleParams={{
               cornerSmoothing: 1,
               cornerRadius: 30,
               fillColor: '#F7F7F7',
-            }}
-          >
-            <TouchableOpacity 
-              activeOpacity={1} 
+            }}>
+            <TouchableOpacity
+              activeOpacity={1}
               onPress={(e) => e.stopPropagation()}
-              style={styles.modalTouchable}
-            >
+              style={styles.modalTouchable}>
               <View style={styles.contentWrapper}>
                 <View style={styles.contentContainer}>
                   <View style={styles.titleContainer}>
@@ -236,8 +209,7 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
                         cornerSmoothing: 1,
                         cornerRadius: 16,
                         fillColor: '#FFFFFF',
-                      }}
-                    >
+                      }}>
                       <View style={styles.textFieldContent}>
                         <TextInput
                           style={styles.textInput}
@@ -256,22 +228,18 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
                       <View style={styles.statusContainer}>
                         {status === 'checking' && (
                           <>
-                            <LoadingSpinner 
-                              size={16} 
-                              color="#2D2D2D"
-                              style={{ padding: 0 }} 
-                            />
+                            <LoadingSpinner size={16} color="#2D2D2D" style={{ padding: 0 }} />
                             <Text style={styles.statusText}>Checking</Text>
                           </>
                         )}
-                        
+
                         {status === 'available' && (
                           <>
                             <Ionicons name="checkmark-circle" size={16} color="#33CD00" />
                             <Text style={styles.statusText}>Your display name is available 🫡</Text>
                           </>
                         )}
-                        
+
                         {status === 'taken' && (
                           <>
                             <Ionicons name="close-circle" size={16} color="#C9252D" />
@@ -282,19 +250,15 @@ const UsernameModal: React.FC<UsernameModalProps> = ({
                     )}
                   </View>
                 </View>
-                
+
                 <SquircleView
                   style={styles.buttonContainer}
                   squircleParams={{
                     cornerSmoothing: 1,
                     cornerRadius: 100000,
                     fillColor: '#40FF00',
-                  }}
-                >
-                  <TouchableOpacity 
-                    style={styles.button}
-                    onPress={handleSetUsername}
-                  >
+                  }}>
+                  <TouchableOpacity style={styles.button} onPress={handleSetUsername}>
                     <Text style={styles.buttonText}>Set username</Text>
                   </TouchableOpacity>
                 </SquircleView>
@@ -427,4 +391,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UsernameModal; 
+export default UsernameModal;

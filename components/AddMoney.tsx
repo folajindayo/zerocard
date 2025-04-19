@@ -1,5 +1,16 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Clipboard, ToastAndroid, Alert, Platform, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Clipboard,
+  ToastAndroid,
+  Alert,
+  Platform,
+  Image,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import QRCode from 'react-native-qrcode-svg';
@@ -36,16 +47,16 @@ interface AddMoneyProps {
 
 const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
   // Sample wallet address - this would come from your wallet/blockchain integration
-  const walletAddress = "0xf235...6h92F";
-  const fullWalletAddress = "0xf235c72e61d7339c76f6b36d8d8c0b6h92F";
+  const walletAddress = '0xf235...6h92F';
+  const fullWalletAddress = '0xf235c72e61d7339c76f6b36d8d8c0b6h92F';
 
   // Handle copying wallet address to clipboard
   const copyToClipboard = () => {
     Clipboard.setString(fullWalletAddress);
-    
+
     // Trigger light haptic feedback when copying
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
+
     if (Platform.OS === 'android') {
       ToastAndroid.show('Address copied to clipboard', ToastAndroid.SHORT);
     } else {
@@ -54,13 +65,10 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
   };
 
   return (
-    <ScrollView 
-      contentContainerStyle={styles.scrollContainer}
-      showsVerticalScrollIndicator={false}
-    >
+    <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <Text style={styles.title}>Load wallet</Text>
-        
+
         <View style={styles.contentContainer}>
           {/* Token selector */}
           <View style={styles.tokenRow}>
@@ -72,7 +80,7 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
               </View>
             </View>
           </View>
-          
+
           {/* QR Code container without gradient border */}
           <View style={styles.qrWrapper}>
             <SquircleView
@@ -81,8 +89,7 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
                 cornerSmoothing: 1,
                 cornerRadius: 20,
                 fillColor: '#FFFFFF',
-              }}
-            >
+              }}>
               <QRCode
                 value={fullWalletAddress}
                 size={280}
@@ -92,27 +99,29 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
               />
             </SquircleView>
           </View>
-          
+
           {/* Wallet address row with gradient border */}
           <View style={styles.addressRow}>
             <LinearGradient
-              colors={['#40FF00', '#7177F9']} 
-              start={{ x: 0, y: 0 }} 
-              end={{ x: 1, y: 0 }} 
-              style={styles.addressGradientBorder}
-            >
+              colors={['#40FF00', '#7177F9']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.addressGradientBorder}>
               <View style={styles.addressContainer}>
-                <Image source={require('../assets/base-logo-in-blue.png')} style={{ width: 16, height: 16 }} />
+                <Image
+                  source={require('../assets/base-logo-in-blue.png')}
+                  style={{ width: 16, height: 16 }}
+                />
                 <Text style={styles.addressText}>{walletAddress}</Text>
               </View>
             </LinearGradient>
-            
+
             <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
               <Text style={styles.copyText}>Copy</Text>
               <Ionicons name="copy-outline" size={16} color="#121212" />
             </TouchableOpacity>
           </View>
-          
+
           {/* Info message */}
           <SquircleView
             style={styles.infoContainer}
@@ -120,11 +129,11 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
               cornerSmoothing: 1,
               cornerRadius: 20,
               fillColor: '#ECECEC',
-            }}
-          >
+            }}>
             <SvgXml xml={infoWalletSvg} width={16} height={16} />
             <Text style={styles.infoText}>
-              Only send USDC on Base to this address, it is only enabled to hold ERC20 tokens on Base
+              Only send USDC on Base to this address, it is only enabled to hold ERC20 tokens on
+              Base
             </Text>
           </SquircleView>
         </View>
@@ -312,4 +321,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddMoney; 
+export default AddMoney;

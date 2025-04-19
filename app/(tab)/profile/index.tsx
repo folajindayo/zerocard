@@ -7,17 +7,16 @@ import ProfileSettings from '../../../components/ProfileSettings';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  
+
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left']}>
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
-          paddingTop: Math.max(24, insets.top), 
-          paddingBottom: Math.max(40, insets.bottom + 20)
+          paddingTop: Math.max(24, insets.top),
+          paddingBottom: Math.max(40, insets.bottom + 20),
         }}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           <ProfileHeader />
           <BasenameDialog />
@@ -40,7 +39,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
- 
+
   content: {
     flex: 1,
     alignItems: 'center',
@@ -50,5 +49,5 @@ const styles = StyleSheet.create({
   settingsContainer: {
     marginTop: 8,
     width: '100%',
-  }
+  },
 });

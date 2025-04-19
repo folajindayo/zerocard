@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
   Animated,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { useFonts } from 'expo-font';
@@ -91,7 +91,7 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
           toValue: 0,
           duration: 150, // Faster close animation
           useNativeDriver: true,
-        })
+        }),
       ]).start(() => {
         setIsWalletPopupVisible(false);
       });
@@ -107,7 +107,7 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
     }
   };
 
-  const walletAddress = "Oxf235..6h92F"; // This would come from your wallet API
+  const walletAddress = 'Oxf235..6h92F'; // This would come from your wallet API
 
   const popupTranslateY = popupAnimation.interpolate({
     inputRange: [0, 1],
@@ -131,12 +131,12 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
             Experience seamless payments and exclusive rewards with your Zerocard
           </Text>
         </View>
-        
+
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <SvgXml xml={closeIconSvg} width={24} height={24} />
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.orderFlowContainer}>
         {/* What we need from you section */}
         <SquircleView
@@ -145,32 +145,31 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
             cornerRadius: 20,
             cornerSmoothing: 1.0,
             fillColor: '#ECECEC',
-          }}
-        >
+          }}>
           <View style={styles.requirementsContent}>
             <Text style={styles.requirementsTitle}>What we need from you</Text>
-            
+
             <View style={styles.requirementsList}>
               <View style={styles.requirementItem}>
                 <View style={styles.requirementDot} />
                 <Text style={styles.requirementText}>Full name</Text>
               </View>
-              
+
               <View style={styles.requirementItem}>
                 <View style={styles.requirementDot} />
                 <Text style={styles.requirementText}>Date of birth</Text>
               </View>
-              
+
               <View style={styles.requirementItem}>
                 <View style={styles.requirementDot} />
                 <Text style={styles.requirementText}>Phone number</Text>
               </View>
-              
+
               <View style={styles.requirementItem}>
                 <View style={styles.requirementDot} />
                 <Text style={styles.requirementText}>Shipping address</Text>
               </View>
-              
+
               <View style={styles.requirementItem}>
                 <View style={styles.requirementDot} />
                 <Text style={styles.requirementText}>Identity Verification</Text>
@@ -178,7 +177,7 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
             </View>
           </View>
         </SquircleView>
-        
+
         {/* Wallet balance section */}
         <SquircleView
           style={styles.walletContainer}
@@ -186,8 +185,7 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
             cornerRadius: 20,
             cornerSmoothing: 1.0,
             fillColor: '#ECECEC',
-          }}
-        >
+          }}>
           <View style={styles.walletContent}>
             <View style={styles.walletInfoContainer}>
               <View style={styles.walletHeaderRow}>
@@ -197,18 +195,18 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
                   </View>
                   <Text style={styles.walletTitle}>Wallet balance</Text>
                 </View>
-                
+
                 <View style={styles.walletBalanceContainer}>
                   <SvgXml xml={usdcIconSvg} width={16} height={16} />
                   <Text style={styles.walletBalanceText}>0 USDC</Text>
                 </View>
               </View>
-              
+
               <Text style={styles.walletMessage}>
                 You need to have at least 7 USDC in your wallet to create your card
               </Text>
             </View>
-            
+
             <TouchableOpacity style={styles.loadWalletButton} onPress={toggleWalletPopup}>
               {isWalletPopupVisible ? (
                 <>
@@ -231,7 +229,7 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
             <Text style={styles.getZeroText}>Get Zero</Text>
             <SvgXml xml={arrowRightIconSvg} width={16} height={16} />
           </TouchableOpacity>
-          
+
           <View style={styles.encryptionContainer}>
             <SvgXml xml={padlockIconSvg} width={14} height={14} />
             <Text style={styles.encryptionText}>Protected by end-to-end encryption</Text>
@@ -240,24 +238,18 @@ const OrderCardFlow: React.FC<OrderCardFlowProps> = ({ onClose, onGetStarted }) 
 
         {/* Wallet Address Popup */}
         {isWalletPopupVisible && (
-          <Animated.View 
+          <Animated.View
             style={[
               styles.walletPopupContainer,
-              { 
+              {
                 transform: [{ translateY: popupTranslateY }, { rotate: '3.34deg' }],
-                opacity: popupOpacity
-              }
-            ]}
-          >
+                opacity: popupOpacity,
+              },
+            ]}>
             <View style={styles.walletImageContainer}>
-              <QRCode
-                value={walletAddress}
-                size={130}
-                backgroundColor="#ECECEC"
-                color="#000000"
-              />
+              <QRCode value={walletAddress} size={130} backgroundColor="#ECECEC" color="#000000" />
             </View>
-            
+
             <View style={styles.walletAddressContainer}>
               <Text style={styles.walletAddressText}>{walletAddress}</Text>
               <View style={styles.walletAddressDivider} />
@@ -576,4 +568,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OrderCardFlow; 
+export default OrderCardFlow;

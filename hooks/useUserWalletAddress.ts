@@ -2,7 +2,7 @@ import { useEmbeddedEthereumWallet } from '@privy-io/expo';
 import { useMemo } from 'react';
 
 /**
- * Custom hook to get the address of the first embedded Ethereum wallet 
+ * Custom hook to get the address of the first embedded Ethereum wallet
  * associated with the currently authenticated Privy user.
  *
  * @returns The wallet address as a string, or undefined if no user is authenticated,
@@ -23,4 +23,4 @@ export function useUserWalletAddress(): string | undefined {
   }, [wallets]); // Dependency array includes wallets
 
   return walletAddress;
-} 
+}

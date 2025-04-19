@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+  Image,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Mock card data
@@ -47,8 +55,7 @@ export default function CardScreen() {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Your Card</Text>
@@ -60,17 +67,19 @@ export default function CardScreen() {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardType}>Virtual Debit</Text>
-              <Image 
-                source={{ uri: 'https://placeholder.com/wp-content/uploads/2018/10/placeholder.com-logo1.png' }} 
+              <Image
+                source={{
+                  uri: 'https://placeholder.com/wp-content/uploads/2018/10/placeholder.com-logo1.png',
+                }}
                 style={styles.networkLogo}
                 resizeMode="contain"
               />
             </View>
-            
+
             <Text style={styles.cardNumber}>
               {showCardDetails ? '4242 4242 4242 4242' : CARD_DATA.cardNumber}
             </Text>
-            
+
             <View style={styles.cardFooter}>
               <View>
                 <Text style={styles.cardLabel}>CARD HOLDER</Text>
@@ -99,7 +108,7 @@ export default function CardScreen() {
           <View style={styles.controlsHeader}>
             <Text style={styles.sectionTitle}>Card Controls</Text>
           </View>
-          
+
           <View style={styles.controlsGrid}>
             <TouchableOpacity style={styles.controlButton}>
               <View style={styles.controlIcon}>
@@ -107,21 +116,21 @@ export default function CardScreen() {
               </View>
               <Text style={styles.controlText}>Lock Card</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.controlButton}>
               <View style={styles.controlIcon}>
                 <Text style={styles.controlIconText}>🌐</Text>
               </View>
               <Text style={styles.controlText}>Online Payments</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.controlButton}>
               <View style={styles.controlIcon}>
                 <Text style={styles.controlIconText}>📱</Text>
               </View>
               <Text style={styles.controlText}>Add to Wallet</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.controlButton}>
               <View style={styles.controlIcon}>
                 <Text style={styles.controlIconText}>🔄</Text>
@@ -139,7 +148,7 @@ export default function CardScreen() {
               <Text style={styles.viewAllButton}>View All</Text>
             </TouchableOpacity>
           </View>
-          
+
           {CARD_DATA.lastTransactions.map((transaction) => (
             <View key={transaction.id} style={styles.transactionItem}>
               <View style={styles.transactionInfo}>
@@ -328,4 +337,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#e74c3c',
   },
-}); 
+});

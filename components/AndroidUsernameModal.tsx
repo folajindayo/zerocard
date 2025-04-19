@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Modal, 
-  View, 
-  Text, 
-  TextInput, 
-  StyleSheet, 
+import {
+  Modal,
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
   Dimensions,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  Platform
+  Platform,
 } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
   withTiming,
-  Easing
+  Easing,
 } from 'react-native-reanimated';
 import { Button } from './Button';
 import * as Haptics from 'expo-haptics';
@@ -36,56 +36,56 @@ const AndroidUsernameModal: React.FC<AndroidUsernameModalProps> = ({
   visible,
   onClose,
   onSetUsername,
-  initialUsername = ''
+  initialUsername = '',
 }) => {
   const [username, setUsername] = useState(initialUsername);
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>('idle');
   const { height } = Dimensions.get('window');
-  
+
   // Animation values
   const translateY = useSharedValue(height);
   const opacity = useSharedValue(0);
-  
+
   // Handle animation when visibility changes
   useEffect(() => {
     if (visible) {
       opacity.value = withTiming(1, { duration: 300 });
-      translateY.value = withSpring(0, { 
+      translateY.value = withSpring(0, {
         damping: 15,
-        stiffness: 100
+        stiffness: 100,
       });
     } else {
       opacity.value = withTiming(0, { duration: 200 });
       translateY.value = withSpring(height, {
         damping: 15,
-        stiffness: 100
+        stiffness: 100,
       });
     }
   }, [visible, height]);
-  
+
   // Animated styles
   const backdropStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
     };
   });
-  
+
   const modalStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateY: translateY.value }],
     };
   });
-  
+
   // Simulate username validation
   useEffect(() => {
     if (username.trim().length > 0) {
       setValidationStatus('checking');
-      
+
       // Simulate an API call to check username availability
       const timeoutId = setTimeout(() => {
         // Randomly determine if the username is available
         const isAvailable = Math.random() > 0.3; // 70% chance of success
-        
+
         if (isAvailable) {
           setValidationStatus('success');
           // Play success haptic feedback
@@ -96,13 +96,13 @@ const AndroidUsernameModal: React.FC<AndroidUsernameModalProps> = ({
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         }
       }, 1000);
-      
+
       return () => clearTimeout(timeoutId);
     } else {
       setValidationStatus('idle');
     }
   }, [username]);
-  
+
   const handleSubmit = () => {
     if (username.trim().length > 0 && validationStatus === 'success') {
       onSetUsername(username);
@@ -112,12 +112,12 @@ const AndroidUsernameModal: React.FC<AndroidUsernameModalProps> = ({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
   };
-  
+
   const renderValidationStatus = () => {
     if (validationStatus === 'idle' || username.trim().length === 0) {
       return null;
     }
-    
+
     if (validationStatus === 'checking') {
       return (
         <View style={styles.validationContainer}>
@@ -126,7 +126,7 @@ const AndroidUsernameModal: React.FC<AndroidUsernameModalProps> = ({
         </View>
       );
     }
-    
+
     if (validationStatus === 'error') {
       return (
         <View style={styles.validationContainer}>
@@ -135,7 +135,7 @@ const AndroidUsernameModal: React.FC<AndroidUsernameModalProps> = ({
         </View>
       );
     }
-    
+
     if (validationStatus === 'success') {
       return (
         <View style={styles.validationContainer}>
@@ -145,34 +145,30 @@ const AndroidUsernameModal: React.FC<AndroidUsernameModalProps> = ({
       );
     }
   };
-  
+
   return (
     <Modal
       transparent
       visible={visible}
       animationType="none"
       statusBarTranslucent={true}
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           {/* Backdrop */}
           <Animated.View style={[styles.backdrop, backdropStyle]} />
-          
+
           {/* Modal Content */}
           <Animated.View style={[styles.modalAnimatedContainer, modalStyle]}>
             <View style={styles.modalContainer}>
               <View style={styles.contentContainer}>
                 <View style={styles.titleContainer}>
                   <Text style={styles.heyText}>Hey,</Text>
-                  <Text style={[
-                    styles.nameText, 
-                    username ? styles.filledNameText : null
-                  ]}>
+                  <Text style={[styles.nameText, username ? styles.filledNameText : null]}>
                     {username ? username : 'pick a name'}
                   </Text>
                 </View>
-                
+
                 <View style={styles.inputContainer}>
                   <TextInput
                     style={styles.textInput}
@@ -183,7 +179,7 @@ const AndroidUsernameModal: React.FC<AndroidUsernameModalProps> = ({
                   />
                   {renderValidationStatus()}
                 </View>
-                
+
                 <View style={styles.buttonWrapper}>
                   <Button
                     title="Set username"
@@ -297,4 +293,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AndroidUsernameModal; 
+export default AndroidUsernameModal;

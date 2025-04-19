@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
@@ -49,11 +49,11 @@ interface SubmissionSummaryProps {
   };
 }
 
-const SubmissionSummary: React.FC<SubmissionSummaryProps> = ({ 
-  onClose, 
-  onContinue, 
+const SubmissionSummary: React.FC<SubmissionSummaryProps> = ({
+  onClose,
+  onContinue,
   onEdit,
-  userData 
+  userData,
 }) => {
   const [showIdentityVerification, setShowIdentityVerification] = useState(false);
 
@@ -91,7 +91,7 @@ const SubmissionSummary: React.FC<SubmissionSummaryProps> = ({
 
   if (showIdentityVerification) {
     return (
-      <IdentityVerification 
+      <IdentityVerification
         onClose={() => setShowIdentityVerification(false)}
         onVerify={handleVerifyIdentity}
       />
@@ -101,24 +101,20 @@ const SubmissionSummary: React.FC<SubmissionSummaryProps> = ({
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView 
+      style={styles.container}>
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <View style={styles.spacer} />
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <SvgXml xml={closeIconSvg} width={24} height={24} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.contentContainer}>
-          <Text style={styles.subheaderText}>
-            Just for confirmation
-          </Text>
-          
+          <Text style={styles.subheaderText}>Just for confirmation</Text>
+
           <Text style={styles.infoText}>
             <Text style={styles.infoTextLabel}>Your name is </Text>
             <Text style={styles.infoTextValue}>{fullName}</Text>
@@ -129,38 +125,27 @@ const SubmissionSummary: React.FC<SubmissionSummaryProps> = ({
             <Text style={styles.infoTextLabel}> and you were born on </Text>
             <Text style={styles.infoTextValue}>{dob}</Text>
           </Text>
-          
-          <Text style={styles.correctText}>
-            Correct?
-          </Text>
+
+          <Text style={styles.correctText}>Correct?</Text>
         </View>
-        
-        <TouchableOpacity 
-          style={styles.editContainer}
-          onPress={onEdit}
-          activeOpacity={0.7}
-        >
+
+        <TouchableOpacity style={styles.editContainer} onPress={onEdit} activeOpacity={0.7}>
           <SvgXml xml={editIconSvg} width={24} height={24} />
-          <Text style={styles.editText}>
-            Click the submission you want to edit
-          </Text>
+          <Text style={styles.editText}>Click the submission you want to edit</Text>
         </TouchableOpacity>
-        
+
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.verifyButton}
-            onPress={handleContinue}
-          >
-            <SvgXml 
-              xml={padlockIconSvg} 
-              width={16} 
-              height={16} 
-              color="#000000" 
+          <TouchableOpacity style={styles.verifyButton} onPress={handleContinue}>
+            <SvgXml
+              xml={padlockIconSvg}
+              width={16}
+              height={16}
+              color="#000000"
               style={styles.buttonIcon}
             />
             <Text style={styles.buttonText}>Verify identity</Text>
           </TouchableOpacity>
-          
+
           <Text style={styles.secureText}>Secure Submission</Text>
         </View>
       </ScrollView>
@@ -284,4 +269,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SubmissionSummary; 
+export default SubmissionSummary;

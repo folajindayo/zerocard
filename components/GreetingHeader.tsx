@@ -30,7 +30,7 @@ export default function GreetingHeader({
     '0x2932b7A2355D6fecc4b5c0B6BD44cC31df247a2e',
     '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
     '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-    '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65'
+    '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
   ];
 
   // Choose a demo address based on the first letter of the username for consistency
@@ -39,18 +39,14 @@ export default function GreetingHeader({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.profileContainer}
         onPress={onProfilePress}
-        disabled={!onProfilePress}
-      >
+        disabled={!onProfilePress}>
         {/* Always use Web3Avatar with the demo address */}
-        <Web3Avatar 
-          address={demoAddress} 
-          size={48}
-        />
+        <Web3Avatar address={demoAddress} size={48} />
       </TouchableOpacity>
-      
+
       <View style={styles.textContainer}>
         <Text style={styles.greetingText}>{getGreeting()},</Text>
         <Text style={styles.usernameText}>{username}</Text>
@@ -108,4 +104,4 @@ const styles = StyleSheet.create({
     lineHeight: 19.2,
     color: '#000',
   },
-}); 
+});
