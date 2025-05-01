@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking } from 'react
 import { SvgXml } from 'react-native-svg';
 import Squircle from 'react-native-squircle';
 import mockData from '../assets/mockdata.json';
+import { usePrivy } from '@privy-io/expo';
+import * as SecureStore from 'expo-secure-store';
 
 // Import SVG icons
 const profileIconSvg = `<svg width="24" height="24" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -54,6 +56,7 @@ const arrowUpIconSvg = `<svg width="24" height="24" viewBox="0 0 18 18" fill="no
 const ProfileSettings: React.FC = () => {
   const [biometricsEnabled, setBiometricsEnabled] = useState(true);
   const userData = mockData.user || {};
+  const privy = usePrivy();
 
   // Set default values or use values from mockData
   const username = userData.username || 'Temidayo Folajin';
@@ -72,9 +75,18 @@ const ProfileSettings: React.FC = () => {
     Linking.openURL('https://www.zerocard.com/privacy');
   };
 
-  const handleLogout = () => {
-    // Handle logout logic
-    console.log('Logging out...');
+  const handleLogout = async () => {
+    try {
+      // Clear any secure storage
+      await SecureStore.deleteItemAsync('user_session');
+      
+      // Logout from Privy
+      await privy.logout();
+      
+      console.log('Successfully logged out');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   const handleCloseAccount = () => {

@@ -14,7 +14,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { usePrivy } from '@privy-io/expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GreetingHeader from '../../../components/GreetingHeader';
-import UsdcBalance from '../../../components/UsdcBalance';
 import CardModule from '../../../components/CardModule';
 import CardStatusComponent from '../../../components/CardStatus';
 import UsernameModal from '../../../components/modal/UsernameModal';
@@ -24,6 +23,11 @@ import TransactionItem from '../../../components/TransactionItem';
 import CardTypeModal from '../../../components/modal/CardTypeModal';
 import SpendingLimitDialog from '../../../components/SpendingLimitDialog';
 import SpendingLimitToast from '../../../components/SpendingLimitToast';
+import WithdrawalToast from '../../../components/WithdrawalToast';
+// Import both Tracking Modals
+import TrackingStatusModal from '../../../components/modal/TrackingStatusModal'; 
+// Define TrackingStatus type locally as it's defined within modals
+type TrackingStatus = 'accepted' | 'picked_up' | 'on_delivery' | 'delivered';
 
 // Import mockdata
 import mockData from '../../../assets/mockdata.json';
@@ -102,7 +106,17 @@ const mockTransactions = generateRandomTransactions();
 export default function HomeScreen() {
   const { user, logout } = usePrivy() as any;
   const insets = useSafeAreaInsets();
-  const { showLimitToast } = useLocalSearchParams<{ showLimitToast?: string }>();
+  const {
+    showLimitToast,
+    showWithdrawalToast,
+    amount: toastAmount,
+    address: toastAddress,
+  } = useLocalSearchParams<{
+    showLimitToast?: string;
+    showWithdrawalToast?: string;
+    amount?: string;
+    address?: string;
+  }>();
 
   // State for user's stage in the onboarding process
   const [userStage, setUserStage] = useState<UserStage>('new_user');
@@ -116,12 +130,16 @@ export default function HomeScreen() {
 
   // State for card type modal
   const [cardTypeModalVisible, setCardTypeModalVisible] = useState(false);
+  
+  // State for tracking status modal visibility
+  const [trackingStatusModalVisible, setTrackingStatusModalVisible] = useState(false);
 
   // State for transactions
   const [transactions, setTransactions] = useState(mockTransactions);
 
   // State for toast
   const [toastVisible, setToastVisible] = useState(false);
+  const [withdrawalToastVisible, setWithdrawalToastVisible] = useState(false);
 
   // Show toast notification if the showLimitToast param is present
   useEffect(() => {
@@ -129,6 +147,13 @@ export default function HomeScreen() {
       setToastVisible(true);
     }
   }, [showLimitToast]);
+
+  // Show withdrawal toast if param present
+  useEffect(() => {
+    if (showWithdrawalToast === 'true') {
+      setWithdrawalToastVisible(true);
+    }
+  }, [showWithdrawalToast]);
 
   // Load saved state from AsyncStorage
   useEffect(() => {
@@ -255,6 +280,13 @@ export default function HomeScreen() {
 
   const handleCheckStatus = () => {
     console.log('Check status pressed');
+    // Only open the modal on iOS
+    if (Platform.OS === 'ios') {
+      setTrackingStatusModalVisible(true);
+    } else {
+      // Optionally, add Android-specific behavior here if needed later
+      console.log('Check status does nothing on Android for now.');
+    }
   };
 
   // Card number based on state
@@ -296,23 +328,43 @@ export default function HomeScreen() {
     router.push('/(app)/spending-limit');
   };
 
+  // Get current tracking status based on user stage (for modal)
+  const getCurrentTrackingStatus = (): TrackingStatus => {
+    // This logic might need refinement based on actual app states
+    if (userStage === 'ordered_card') {
+      return 'picked_up'; // Or 'on_delivery' based on more detailed status
+    }
+    if (userStage === 'activated_card' || userStage === 'has_transactions') {
+      return 'delivered'; // Assuming delivered if activated
+    }
+    return 'accepted'; // Default if new_user or just ordered
+  };
+
+  // Generate estimated delivery date (example: 5 days from now)
+  const getEstimatedDeliveryDate = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 5);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Toast notification */}
       <SpendingLimitToast visible={toastVisible} onDismiss={() => setToastVisible(false)} />
 
-      {/* Username Modal - only on iOS */}
-      {Platform.OS === 'ios' && (
+      {/* Username Modals (Platform specific) */}
+      {Platform.OS === 'ios' ? (
         <UsernameModal
           visible={usernameModalVisible}
           onClose={() => setUsernameModalVisible(false)}
           onSetUsername={handleSetUsername}
           initialUsername={username}
         />
-      )}
-
-      {/* Android Username Modal */}
-      {Platform.OS === 'android' && (
+      ) : (
         <AndroidUsernameModal
           visible={androidUsernameModalVisible}
           onClose={() => setAndroidUsernameModalVisible(false)}
@@ -321,11 +373,19 @@ export default function HomeScreen() {
         />
       )}
 
-      {/* Card Type Modal */}
+      {/* Card Type Modal (Common) */}
       <CardTypeModal
         visible={cardTypeModalVisible}
         onClose={() => setCardTypeModalVisible(false)}
         onSelectCardType={handleSelectCardType}
+      />
+      
+      {/* Tracking Status Modal (Now common) */}
+      <TrackingStatusModal
+        visible={trackingStatusModalVisible}
+        onClose={() => setTrackingStatusModalVisible(false)}
+        estimatedDeliveryDate={getEstimatedDeliveryDate()}
+        currentStatus={getCurrentTrackingStatus()}
       />
 
       {/* Fixed Header */}
@@ -341,17 +401,9 @@ export default function HomeScreen() {
         style={styles.scrollContent}
         contentContainerStyle={styles.scrollContentContainer}
         showsVerticalScrollIndicator={false}>
-        {/* Balance Section - show 0 for new users */}
-        <UsdcBalance amount={userStage === 'new_user' ? 0 : mockData.user.balance} />
-
         {/* Card Module */}
         <View style={styles.cardModuleContainer}>
-          <CardModule
-            cardNumber={getCardNumber()}
-            cardHolderName={displayName || 'Your Name Here'}
-            expiryDate={getExpiryDate()}
-            walletAddress={getWalletAddress()}
-          />
+          <CardModule />
         </View>
 
         {/* Card Status - Only show for new users and users who ordered a card */}
@@ -377,9 +429,6 @@ export default function HomeScreen() {
             <CardControls
               onLoadCard={() => {
                 console.log('Load card pressed');
-              }}
-              onWithdraw={() => {
-                console.log('Withdraw pressed');
               }}
               onFreezeCard={() => {
                 console.log('Freeze card pressed');
@@ -429,6 +478,15 @@ export default function HomeScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Withdrawal success toast overlay */}
+      {withdrawalToastVisible && toastAmount && toastAddress && (
+        <WithdrawalToast
+          amount={toastAmount as string}
+          address={toastAddress as string}
+          onHide={() => setWithdrawalToastVisible(false)}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -453,8 +511,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   cardModuleContainer: {
-    marginTop: 16,
-    height: 244, // Providing enough height for the stacked cards
+    // marginTop: 16, // Remove this line
   },
   transactionsContainer: {
     marginTop: 24, // Increased from 16px to 24px from card controls
@@ -479,7 +536,7 @@ const styles = StyleSheet.create({
   },
   cardStatusContainer: {
     marginTop: Platform.select({
-      android: 32,
+      android: 8,
       ios: 8,
       default: 8,
     }),

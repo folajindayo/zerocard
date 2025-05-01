@@ -35,7 +35,17 @@ export default function RootLayout() {
   }
 
   return (
-    <PrivyProvider appId={privyAppId} clientId={privyClientId}>
+    <PrivyProvider 
+      appId={privyAppId} 
+      clientId={privyClientId}
+      config={{
+        embedded: {
+          ethereum: {
+            createOnLogin: 'users-without-wallets', // Create wallets automatically for users who don't have one
+          },
+        },
+      }}
+    >
       {/* Network status toast notification */}
       <NetworkStatus />
 

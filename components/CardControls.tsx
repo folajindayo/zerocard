@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { router } from 'expo-router';
 
 interface CardControlsProps {
   onLoadCard?: () => void;
-  onWithdraw?: () => void;
   onFreezeCard?: () => void;
 }
 
@@ -73,7 +73,12 @@ const freezeIconSvg = `<svg width="25" height="24" viewBox="0 0 25 24" fill="non
 </defs>
 </svg>`;
 
-const CardControls: React.FC<CardControlsProps> = ({ onLoadCard, onWithdraw, onFreezeCard }) => {
+const CardControls: React.FC<CardControlsProps> = ({ onLoadCard, onFreezeCard }) => {
+  
+  const handleWithdrawPress = () => {
+    router.push('/withdraw-funds');
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.buttonContainer} onPress={onLoadCard} activeOpacity={0.7}>
@@ -81,7 +86,7 @@ const CardControls: React.FC<CardControlsProps> = ({ onLoadCard, onWithdraw, onF
         <Text style={styles.buttonText}>Load card</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.buttonContainer} onPress={onWithdraw} activeOpacity={0.7}>
+      <TouchableOpacity style={styles.buttonContainer} onPress={handleWithdrawPress} activeOpacity={0.7}>
         <SvgXml xml={withdrawCardSvg} width={18} height={18} />
         <Text style={styles.buttonText}>Withdraw</Text>
       </TouchableOpacity>

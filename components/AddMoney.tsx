@@ -10,6 +10,8 @@ import {
   Alert,
   Platform,
   Image,
+  Pressable,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
@@ -17,6 +19,9 @@ import QRCode from 'react-native-qrcode-svg';
 import { SquircleView } from 'react-native-figma-squircle';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { useUserWalletAddress } from '../hooks/useUserWalletAddress';
+import { useEmbeddedEthereumWallet, usePrivy } from '@privy-io/expo';
+import SkeletonLoader from './SkeletonLoader';
 
 // Import SVG files as strings
 const usdcSvg = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,13 +51,52 @@ interface AddMoneyProps {
 }
 
 const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
-  // Sample wallet address - this would come from your wallet/blockchain integration
-  const walletAddress = '0xf235...6h92F';
-  const fullWalletAddress = '0xf235c72e61d7339c76f6b36d8d8c0b6h92F';
+  const [copyPressed, setCopyPressed] = React.useState(false);
+  const { width } = useWindowDimensions();
+  
+  // Get raw wallet data for debugging - check actual API properties
+  const { wallets } = useEmbeddedEthereumWallet();
+  const privy = usePrivy();
+  const authenticated = !!privy.user; // User exists when authenticated
+  
+  // For debugging - log wallet state
+  React.useEffect(() => {
+    console.log('[AddMoney] User exists:', !!privy.user);
+    console.log('[AddMoney] User ID:', privy.user?.id);
+    console.log('[AddMoney] Wallets count:', wallets?.length || 0);
+    if (wallets?.length > 0) {
+      console.log('[AddMoney] First wallet address:', wallets[0].address);
+    }
+  }, [privy.user, wallets]);
+  
+  // Get wallet address from hook
+  const walletAddress = useUserWalletAddress();
+  
+  // No fallback address, just use the real wallet address
+  const effectiveAddress = walletAddress;
+  const isLoading = authenticated && wallets?.length > 0 && !walletAddress;
+  const noWalletFound = !authenticated || wallets?.length === 0 || !walletAddress;
+  
+  // Calculate QR code size based on container width
+  const qrSize = React.useMemo(() => {
+    // Calculate available width after accounting for horizontal padding (48px total)
+    const containerWidth = width - 48; // 24px padding on each side of the container
+    const availableWidth = containerWidth - 48; // 24px padding on each side of QR container
+    return Math.floor(availableWidth);
+  }, [width]);
+
+  // Display a formatted truncated wallet address
+  const displayAddress = React.useMemo(() => {
+    if (!effectiveAddress) return '';
+    if (effectiveAddress.length <= 12) return effectiveAddress;
+    return `${effectiveAddress.substring(0, 6)}...${effectiveAddress.substring(effectiveAddress.length - 4)}`;
+  }, [effectiveAddress]);
 
   // Handle copying wallet address to clipboard
   const copyToClipboard = () => {
-    Clipboard.setString(fullWalletAddress);
+    if (!effectiveAddress) return;
+    
+    Clipboard.setString(effectiveAddress);
 
     // Trigger light haptic feedback when copying
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -64,10 +108,20 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
     }
   };
 
+  // Auth status indicator for debugging
+  const renderAuthStatus = () => {
+    if (!privy.user) return <Text style={styles.debugText}>Not authenticated. Please login first.</Text>;
+    if (!walletAddress && wallets?.length > 0) return <Text style={styles.debugText}>Wallet found but address not available.</Text>;
+    return null;
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <Text style={styles.title}>Load wallet</Text>
+        
+        {/* Debug section - only visible in development */}
+        {process.env.NODE_ENV === 'development' && renderAuthStatus()}
 
         <View style={styles.contentContainer}>
           {/* Token selector */}
@@ -90,13 +144,25 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
                 cornerRadius: 20,
                 fillColor: '#FFFFFF',
               }}>
-              <QRCode
-                value={fullWalletAddress}
-                size={280}
-                color="#000000"
-                backgroundColor="#ffffff"
-                logoBackgroundColor="white"
-              />
+              {isLoading ? (
+                <SkeletonLoader 
+                  width={qrSize} 
+                  height={qrSize} 
+                  borderRadius={10} 
+                />
+              ) : noWalletFound ? (
+                <View style={styles.noWalletContainer}>
+                  <Text style={styles.noWalletText}>No wallet found</Text>
+                </View>
+              ) : (
+                <QRCode
+                  value={effectiveAddress}
+                  size={qrSize}
+                  color="#000000"
+                  backgroundColor="#ffffff"
+                  logoBackgroundColor="white"
+                />
+              )}
             </SquircleView>
           </View>
 
@@ -112,14 +178,31 @@ const AddMoney: React.FC<AddMoneyProps> = ({ onFundedWallet, onSkip }) => {
                   source={require('../assets/base-logo-in-blue.png')}
                   style={{ width: 16, height: 16 }}
                 />
-                <Text style={styles.addressText}>{walletAddress}</Text>
+                {isLoading ? (
+                  <SkeletonLoader 
+                    width={100} 
+                    height={17} 
+                    borderRadius={4} 
+                  />
+                ) : noWalletFound ? (
+                  <Text style={styles.addressText}>No wallet found</Text>
+                ) : (
+                  <Text style={styles.addressText}>{displayAddress}</Text>
+                )}
               </View>
             </LinearGradient>
 
-            <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
+            <Pressable 
+              style={({ pressed }) => [
+                styles.copyButton,
+                pressed && styles.copyButtonPressed,
+              ]}
+              onPress={copyToClipboard}
+              disabled={noWalletFound}
+            >
               <Text style={styles.copyText}>Copy</Text>
               <Ionicons name="copy-outline" size={16} color="#121212" />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Info message */}
@@ -165,21 +248,19 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   contentContainer: {
-    width: 329,
+    width: '100%',
     flexDirection: 'column',
     alignItems: 'flex-start',
     padding: 0,
     gap: 12,
   },
   tokenRow: {
-    width: 329,
-    height: 39,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 0,
     gap: 24,
-    alignSelf: 'stretch',
+    width: '100%',
   },
   tokenSelector: {
     flexDirection: 'row',
@@ -188,7 +269,7 @@ const styles = StyleSheet.create({
     padding: 8,
     paddingHorizontal: 16,
     gap: 10,
-    width: 329,
+    width: '100%',
     height: 39,
     backgroundColor: '#FFFFFF',
     shadowColor: 'rgba(0, 0, 0, 0.05)',
@@ -225,16 +306,15 @@ const styles = StyleSheet.create({
     color: '#121212',
   },
   qrWrapper: {
-    width: 329,
-    height: 320,
+    width: '100%',
+    aspectRatio: 1,
     alignSelf: 'stretch',
   },
   qrContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 12,
-    paddingHorizontal: 8,
+    padding: 24,
     width: '100%',
     height: '100%',
     backgroundColor: '#FFFFFF',
@@ -254,7 +334,7 @@ const styles = StyleSheet.create({
   },
   addressGradientBorder: {
     borderRadius: 1000,
-    padding: 2, // Border thickness
+    padding: 2,
   },
   addressContainer: {
     flexDirection: 'row',
@@ -293,6 +373,9 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     borderRadius: 1000,
   },
+  copyButtonPressed: {
+    opacity: 0.7,
+  },
   copyText: {
     fontFamily: 'SF Pro Text',
     fontWeight: '500',
@@ -318,6 +401,29 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: '#484848',
     flex: 1,
+  },
+  debugText: {
+    fontSize: 12,
+    color: '#FF3B30',
+    marginBottom: 10,
+    textAlign: 'center',
+    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    padding: 4,
+    borderRadius: 4,
+  },
+  noWalletContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  noWalletText: {
+    fontFamily: 'SF Pro Text',
+    fontWeight: '500',
+    fontSize: 16,
+    color: '#808080',
+    textAlign: 'center',
   },
 });
 

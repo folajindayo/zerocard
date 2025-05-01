@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType } from 'react-native';
 import Web3Avatar from './Web3Avatar';
+import { useUserWalletAddress } from '../hooks/useUserWalletAddress';
 
 interface GreetingHeaderProps {
   username: string;
@@ -15,6 +16,9 @@ export default function GreetingHeader({
   initial = 'U',
   onProfilePress,
 }: GreetingHeaderProps) {
+  // Get real wallet address using our hook
+  const walletAddress = useUserWalletAddress();
+  
   // Get current time to determine greeting
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -23,19 +27,8 @@ export default function GreetingHeader({
     return 'Good evening';
   };
 
-  // Hardcoded wallet addresses for demo purposes
-  // These will generate different gradient styles based on the address
-  const demoAddresses = [
-    '0x11Ed0AC7D6142481E459B6e5d4bfB5646277796f',
-    '0x2932b7A2355D6fecc4b5c0B6BD44cC31df247a2e',
-    '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
-    '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-    '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
-  ];
-
-  // Choose a demo address based on the first letter of the username for consistency
-  const addressIndex = username.charCodeAt(0) % demoAddresses.length;
-  const demoAddress = demoAddresses[addressIndex];
+  // Fallback address in case wallet isn't loaded yet
+  const fallbackAddress = '0x0000000000000000000000000000000000000000';
 
   return (
     <View style={styles.container}>
@@ -43,8 +36,8 @@ export default function GreetingHeader({
         style={styles.profileContainer}
         onPress={onProfilePress}
         disabled={!onProfilePress}>
-        {/* Always use Web3Avatar with the demo address */}
-        <Web3Avatar address={demoAddress} size={48} />
+        {/* Use real wallet address or fallback if not available */}
+        <Web3Avatar address={walletAddress || fallbackAddress} size={48} />
       </TouchableOpacity>
 
       <View style={styles.textContainer}>

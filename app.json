@@ -4,7 +4,7 @@
     "slug": "zerocard",
     "version": "1.0.0",
     "scheme": "zerocard",
-    "owner": "zerocard",
+    "owner": "folajindayo",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -46,7 +46,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#f7f7f7"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "newArchEnabled": true,
@@ -54,7 +56,8 @@
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
-        }
+        },
+        "ITSAppUsesNonExemptEncryption": false
       },
       "bundleIdentifier": "com.zerocard.zerocard"
     },
@@ -64,8 +67,18 @@
         "backgroundColor": "#ffffff"
       },
       "newArchEnabled": true,
-      "package": "com.zerocard.zerocard"
+      "package": "com.zerocard.zerocard",
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
-    "extra": {}
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "95e69556-dbf1-4c9c-9e13-cc8b86076f5d"
+      }
+    }
   }
 }

@@ -26,6 +26,7 @@ import * as FileSystem from 'expo-file-system';
 import QRCode from 'react-native-qrcode-svg';
 import * as ScreenCapture from 'expo-screen-capture';
 import * as MediaLibrary from 'expo-media-library';
+import { useUserWalletAddress } from '../../../hooks/useUserWalletAddress';
 
 // Disable yellow box warnings for dev
 LogBox.ignoreLogs(['ViewShot']);
@@ -70,6 +71,9 @@ export default function LoadWalletScreen() {
   const pixelRatio = PixelRatio.get();
   const [lastScreenshotTime, setLastScreenshotTime] = useState(0);
   const appState = useRef(AppState.currentState);
+  
+  // Get the actual wallet address
+  const walletAddress = useUserWalletAddress();
 
   const handleFundedWallet = () => {
     router.push('/(tab)/home');
@@ -247,11 +251,10 @@ export default function LoadWalletScreen() {
               {/* QR Code Container */}
               <View style={styles.qrCodeContainer}>
                 <QRCode
-                  value={'0xf235c72e61d7339c76f6b36d8d8c0b6h92F'}
-                  size={280}
+                  value={walletAddress || ''}
+                  size={250}
                   color="#000000"
                   backgroundColor="#ffffff"
-                  logoBackgroundColor="white"
                 />
               </View>
 

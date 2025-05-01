@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import * as NavigationBarExpo from 'expo-navigation-bar';
+import Web3Avatar from '../Web3Avatar';
+import { useUserWalletAddress } from '../../hooks/useUserWalletAddress';
 
 interface NavigationBarProps {
   onHomePress?: () => void;
@@ -249,10 +251,21 @@ function AddCircleIcon({ active = false }: { active?: boolean }) {
 }
 
 function ProfileIcon({ active = false }: { active?: boolean }) {
+  // Get user's wallet address
+  const walletAddress = useUserWalletAddress();
+  
+  // Fallback address in case wallet isn't loaded yet
+  const fallbackAddress = '0x0000000000000000000000000000000000000000';
+
   return (
     <View style={[styles.iconWrapper, styles.profileIcon]}>
-      {/* This would typically be a user's profile image */}
-      <View style={[styles.profileCircle, active && styles.profileCircleActive]} />
+      {/* Replace static profile circle with Web3Avatar */}
+      <View style={active ? styles.profileCircleActive : undefined}>
+        <Web3Avatar 
+          address={walletAddress || fallbackAddress} 
+          size={26} 
+        />
+      </View>
     </View>
   );
 }
@@ -309,6 +322,11 @@ const styles = StyleSheet.create({
   profileCircleActive: {
     borderWidth: 2,
     borderColor: '#40FF00',
+    borderRadius: 15, // Slightly larger to account for the border
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

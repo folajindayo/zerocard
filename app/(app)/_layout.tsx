@@ -68,6 +68,13 @@ export default function AppLayout() {
               },
             }}
           />
+          <Stack.Screen
+            name="withdraw-funds"
+            options={{
+              title: 'Withdraw Funds',
+              contentStyle: { backgroundColor: '#1f1f1f', paddingHorizontal: 0 },
+            }}
+          />
         </Stack>
       </AuthBoundary>
     </SafeAreaProvider>

@@ -231,7 +231,15 @@ export default function SetPinScreen() {
 
   // Format PIN for display
   const formatPinForDisplay = () => {
-    if (!pin) return { firstPart: 'XXX', secondPart: 'XXX' };
+    // Handle empty pin explicitly
+    if (!pin) {
+      return {
+        firstPart: '',            // Empty
+        firstPlaceholder: 'XXX',   // Placeholder has content
+        secondPart: '',           // Empty
+        secondPlaceholder: 'XXX',  // Placeholder has content
+      };
+    }
 
     // If PIN contains a hyphen, split it
     if (pin.includes('-')) {
@@ -259,7 +267,7 @@ export default function SetPinScreen() {
     const secondPart = pin.substring(3);
     return {
       firstPart: firstPart,
-      firstPlaceholder: '',
+      firstPlaceholder: '', // No placeholder needed if first part is full
       secondPart: secondPart,
       secondPlaceholder: 'X'.repeat(Math.max(0, 3 - secondPart.length)),
     };
@@ -349,18 +357,28 @@ export default function SetPinScreen() {
                   activeOpacity={0.9}
                   style={error ? styles.inputContainerError : styles.inputContainer}
                   onPress={() => pinInputRef.current?.focus()}>
-                  {/* Restructure PIN display with sequential Text components */}
+                  {/* Restructure PIN display with conditional rendering */}
                   <View style={styles.pinDisplayContainer}>
-                    <Text style={error ? styles.pinTextError : styles.pinTextActive}>
-                      {firstPart}
-                    </Text>
+                    {/* Render white text only if firstPart has digits */}
+                    {firstPart && (
+                      <Text style={error ? styles.pinTextError : styles.pinTextActive}>
+                        {firstPart}
+                      </Text>
+                    )}
+                    {/* Always render grey placeholder Xs */}
                     <Text style={error ? styles.pinTextError : styles.pinText}>
                       {firstPlaceholder}
                     </Text>
+                    
                     <Text style={styles.pinSeparator}>-</Text>
-                    <Text style={error ? styles.pinTextError : styles.pinTextActive}>
-                      {secondPart}
-                    </Text>
+                    
+                    {/* Render white text only if secondPart has digits */}
+                    {secondPart && (
+                      <Text style={error ? styles.pinTextError : styles.pinTextActive}>
+                        {secondPart}
+                      </Text>
+                    )}
+                    {/* Always render grey placeholder Xs */}
                     <Text style={error ? styles.pinTextError : styles.pinText}>
                       {secondPlaceholder}
                     </Text>

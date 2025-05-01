@@ -3,8 +3,11 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-na
 import * as ImagePicker from 'expo-image-picker';
 import { SvgXml } from 'react-native-svg';
 import * as Clipboard from 'expo-clipboard';
+import { useUserWalletAddress } from '../hooks/useUserWalletAddress';
+import SkeletonLoader from './SkeletonLoader';
+import Web3Avatar from './Web3Avatar';
 
-// Import mockdata for user profile info
+// Import mockdata for user profile info - only for username now
 import mockData from '../assets/mockdata.json';
 
 // Import the edit icon SVG - simplified without unsupported filters
@@ -25,10 +28,18 @@ const copyIconSvg = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"
 
 const ProfileHeader: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const { username, walletAddress } = mockData.user;
-
+  const { username } = mockData.user;
+  
+  // Use our wallet address hook to get the real wallet address
+  const walletAddress = useUserWalletAddress();
+  const isLoading = !walletAddress;
+  
   // Format wallet address to show first and last characters
-  const formattedWalletAddress = walletAddress || '0x0000..0000';
+  const formattedWalletAddress = React.useMemo(() => {
+    if (!walletAddress) return '';
+    if (walletAddress.length <= 12) return walletAddress;
+    return `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
+  }, [walletAddress]);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -39,7 +50,7 @@ const ProfileHeader: React.FC = () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -51,6 +62,8 @@ const ProfileHeader: React.FC = () => {
   };
 
   const copyToClipboard = async () => {
+    if (!walletAddress) return;
+    
     await Clipboard.setStringAsync(walletAddress);
     Alert.alert('Copied', 'Wallet address copied to clipboard');
   };
@@ -60,6 +73,9 @@ const ProfileHeader: React.FC = () => {
     return username ? username.charAt(0).toUpperCase() : 'U';
   };
 
+  // Fallback address for Web3Avatar if wallet isn't loaded yet
+  const fallbackAddress = '0x0000000000000000000000000000000000000000';
+
   return (
     <View style={styles.container}>
       {/* Profile image with edit button */}
@@ -68,9 +84,12 @@ const ProfileHeader: React.FC = () => {
           {profileImage ? (
             <Image source={{ uri: profileImage }} style={styles.profileImage} />
           ) : (
-            <View style={styles.profileImagePlaceholder}>
-              <Text style={styles.profileInitial}>{getInitials()}</Text>
-            </View>
+            // Use Web3Avatar instead of the color placeholder with initials
+            <Web3Avatar 
+              address={walletAddress || fallbackAddress} 
+              size={64} 
+              style={styles.profileImage}
+            />
           )}
           <View style={styles.editIconContainer}>
             <SvgXml xml={editIconSvg} width={24} height={24} />
@@ -82,8 +101,21 @@ const ProfileHeader: React.FC = () => {
       <Text style={styles.username}>{username}</Text>
 
       {/* Wallet address with copy button */}
-      <TouchableOpacity style={styles.walletContainer} onPress={copyToClipboard}>
-        <Text style={styles.walletAddress}>{formattedWalletAddress}</Text>
+      <TouchableOpacity 
+        style={styles.walletContainer} 
+        onPress={copyToClipboard}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <SkeletonLoader 
+            width={100} 
+            height={17} 
+            borderRadius={8}
+            backgroundColor="rgba(0, 0, 0, 0.1)"
+          />
+        ) : (
+          <Text style={styles.walletAddress}>{formattedWalletAddress}</Text>
+        )}
         <SvgXml xml={copyIconSvg} width={14} height={14} />
       </TouchableOpacity>
     </View>
