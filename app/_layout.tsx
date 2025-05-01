@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { PrivyProvider, PrivyElements } from '@privy-io/expo';
 import { useEffect } from 'react';
 import NetworkStatus from '../components/NetworkStatus';
+import { CryptoDepositProvider } from '../components/context/CryptoDepositContext';
 
 export default function RootLayout() {
   // Get Privy app ID and client ID directly from environment variables
@@ -46,15 +47,19 @@ export default function RootLayout() {
         },
       }}
     >
-      {/* Network status toast notification */}
-      <NetworkStatus />
+      <CryptoDepositProvider>
+        {/* Network status toast notification */}
+        <NetworkStatus />
 
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: '#f7f7f7' },
-        }}
-      />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: '#f7f7f7' },
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </CryptoDepositProvider>
       <PrivyElements />
     </PrivyProvider>
   );

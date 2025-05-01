@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import UsernameModal from '../components/UsernameModal';
+import UsernameModal from '../components/modal/UsernameModal';
 
 // Storage key for checking if user has set username
 const USERNAME_SET_KEY = 'username_set';

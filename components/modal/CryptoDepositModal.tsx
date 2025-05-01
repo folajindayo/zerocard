@@ -14,34 +14,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import { SquircleView } from 'react-native-figma-squircle';
 import BlurBackground from '../BlurBackground';
+import useCryptoDepositListener from '../context/CryptoDepositContext';
 
 interface CryptoDepositModalProps {
-  visible: boolean;
-  onClose: () => void;
-  amount: string;
-  currency: string;
-  timestamp: { date: string; time: string };
-  transactionHash?: string;
-  chain?: string;
   position?: { top: number; left: number };
 }
 
-const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
-  visible,
-  onClose,
-  amount,
-  currency,
-  timestamp,
-  transactionHash,
-  chain = 'Base',
-  position,
-}) => {
+const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({ position }) => {
+  const { isModalVisible, currentTransaction, setIsModalVisible } = useCryptoDepositListener();
   const opacity = React.useRef(new Animated.Value(0)).current;
   const translateY = React.useRef(new Animated.Value(100)).current;
   const { width } = Dimensions.get('window');
 
   React.useEffect(() => {
-    if (visible) {
+    if (isModalVisible) {
       Animated.parallel([
         Animated.timing(opacity, {
           toValue: 1,
@@ -72,7 +58,7 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
         }),
       ]).start();
     }
-  }, [visible, opacity, translateY]);
+  }, [isModalVisible, opacity, translateY]);
 
   // USDC SVG
   const usdcSvg = `<svg width="48" height="48" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,11 +73,13 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
     top: 437, // Default top position
   };
 
-  return (
-    <Modal transparent visible={visible} animationType="none" onRequestClose={onClose}>
-      <BlurBackground visible={visible} intensity={40} tint="dark" />
+  if (!currentTransaction) return null;
 
-      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
+  return (
+    <Modal transparent visible={isModalVisible} animationType="none" onRequestClose={() => setIsModalVisible(false)}>
+      <BlurBackground visible={isModalVisible} intensity={40} tint="dark" />
+
+      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setIsModalVisible(false)}>
         <Animated.View
           style={[
             styles.modalAnimatedContainer,
@@ -132,14 +120,14 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
                   <Text style={styles.headerText}>
                     You just received{' '}
                     <Text style={styles.highlightText}>
-                      {amount} {currency}
+                      {currentTransaction.amount} {currentTransaction.currency}
                     </Text>{' '}
                     on <Text style={styles.addressText}>Oxbaed..4g62f</Text>
                   </Text>
 
                   <View style={styles.timestampContainer}>
-                    <Text style={styles.timestampText}>{timestamp.date}</Text>
-                    <Text style={styles.timestampText}>{timestamp.time}</Text>
+                    <Text style={styles.timestampText}>{currentTransaction.timestamp.date}</Text>
+                    <Text style={styles.timestampText}>{currentTransaction.timestamp.time}</Text>
                   </View>
                 </View>
 
@@ -160,7 +148,7 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
                           source={require('../../assets/base-logo-in-blue.png')}
                           style={styles.chainLogo}
                         />
-                        <Text style={styles.detailValue}>{chain}</Text>
+                        <Text style={styles.detailValue}>{currentTransaction.chain}</Text>
                       </View>
                     </View>
                   </View>
@@ -171,13 +159,13 @@ const CryptoDepositModal: React.FC<CryptoDepositModalProps> = ({
                   <View style={styles.detailRow}>
                     <View style={styles.detailContent}>
                       <Text style={styles.detailLabel}>Amount</Text>
-                      <Text style={styles.detailValue}>${amount}</Text>
+                      <Text style={styles.detailValue}>${currentTransaction.amount}</Text>
                     </View>
                   </View>
                 </SquircleView>
 
                 {/* Transaction hash button */}
-                {transactionHash && (
+                {currentTransaction.transactionHash && (
                   <SquircleView
                     style={styles.transactionHashButton}
                     squircleParams={{

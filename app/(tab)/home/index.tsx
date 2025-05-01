@@ -26,6 +26,7 @@ import SpendingLimitToast from '../../../components/SpendingLimitToast';
 import WithdrawalToast from '../../../components/WithdrawalToast';
 // Import both Tracking Modals
 import TrackingStatusModal from '../../../components/modal/TrackingStatusModal'; 
+import CryptoDepositModal from '../../../components/modal/CryptoDepositModal';
 // Define TrackingStatus type locally as it's defined within modals
 type TrackingStatus = 'accepted' | 'picked_up' | 'on_delivery' | 'delivered';
 
@@ -387,6 +388,9 @@ export default function HomeScreen() {
         estimatedDeliveryDate={getEstimatedDeliveryDate()}
         currentStatus={getCurrentTrackingStatus()}
       />
+
+      {/* Crypto Deposit Modal */}
+      <CryptoDepositModal />
 
       {/* Fixed Header */}
       <View style={[styles.fixedHeader, { paddingTop: insets.top > 0 ? 8 : 4 }]}>
